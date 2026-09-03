@@ -20,6 +20,9 @@ export interface DropdownFilterProps {
   activePrefix?: string;
 }
 
+// Filter chip: 32px tall, radius 6 (not a pill), 1px --line-strong, 12px pad.
+// Active = --accent-soft background, --accent border and text. Chevron only
+// because it opens a menu (DESIGN_SYSTEM.md §6).
 export function DropdownFilter({
   label,
   options,
@@ -69,25 +72,23 @@ export function DropdownFilter({
       : selectedLabels.join(", ");
 
   return (
-    <div ref={rootRef} className="relative inline-block">
+    <div ref={rootRef} className="relative inline-block shrink-0">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-controls={panelId}
         className={cn(
-          "inline-flex h-9 items-center gap-1.5 rounded-full border px-3 text-sm transition-colors duration-150 focus-visible:outline-none",
+          "inline-flex h-8 items-center gap-1.5 rounded border px-3 text-small transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent",
           active
-            ? "border-accent/30 bg-accent/5 text-ink"
-            : "border-line bg-surface text-ink hover:bg-paper",
+            ? "border-accent bg-accent-soft text-accent"
+            : "border-line-strong bg-paper text-ink-2 hover:bg-surface-hover",
         )}
       >
-        <span className={cn(active && "font-medium")}>{triggerText}</span>
-        {active ? (
-          <CheckIcon className="text-ok" />
-        ) : (
-          <ChevronIcon className={cn("transition-transform", open && "rotate-180")} />
-        )}
+        <span>{triggerText}</span>
+        <ChevronIcon
+          className={cn("transition-transform", open && "rotate-180")}
+        />
       </button>
 
       {open && (
@@ -95,7 +96,7 @@ export function DropdownFilter({
           id={panelId}
           role="listbox"
           aria-multiselectable={multiple || undefined}
-          className="absolute left-0 z-30 mt-2 min-w-56 rounded-md border border-line bg-surface p-1 shadow-pop"
+          className="absolute left-0 z-30 mt-1.5 min-w-56 rounded-lg border border-line bg-paper p-1 shadow-float"
         >
           {options.map((o) => {
             const checked = value.includes(o.value);
@@ -106,15 +107,14 @@ export function DropdownFilter({
                 role="option"
                 aria-selected={checked}
                 onClick={() => toggle(o.value)}
-                className={cn(
-                  "flex w-full items-center gap-2.5 rounded px-2.5 py-2 text-left text-base text-ink transition-colors duration-150 hover:bg-paper focus-visible:outline-none",
-                )}
+                className="flex w-full items-center gap-2.5 rounded px-2.5 py-2 text-left text-body text-ink transition-colors hover:bg-surface-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
               >
                 <span
                   className={cn(
-                    "flex h-4 w-4 shrink-0 items-center justify-center border",
-                    multiple ? "rounded-sm" : "rounded-full",
-                    checked ? "border-accent bg-accent text-accent-ink" : "border-line",
+                    "flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border",
+                    checked
+                      ? "border-accent bg-accent text-white"
+                      : "border-line-strong",
                   )}
                 >
                   {checked && <CheckIcon className="h-3 w-3" />}
@@ -127,7 +127,7 @@ export function DropdownFilter({
             <button
               type="button"
               onClick={() => onChange([])}
-              className="mt-1 w-full rounded px-2.5 py-2 text-left text-sm text-ink-muted hover:bg-paper focus-visible:outline-none"
+              className="mt-1 w-full rounded px-2.5 py-2 text-left text-small text-ink-3 hover:bg-surface-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
             >
               გასუფთავება
             </button>
@@ -142,7 +142,7 @@ function ChevronIcon({ className }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 16 16"
-      className={cn("h-3.5 w-3.5 text-ink-muted", className)}
+      className={cn("h-3.5 w-3.5", className)}
       fill="none"
       aria-hidden="true"
     >

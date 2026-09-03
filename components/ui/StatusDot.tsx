@@ -8,49 +8,36 @@ export type OrderStatus =
   | "REJECTED"
   | "CANCELLED";
 
-interface StatusMeta {
-  label: string;
-  /** token colour */
-  color: string;
-  /** filled dot vs hollow ring */
-  fill: boolean;
-}
-
-const STATUS: Record<OrderStatus, StatusMeta> = {
-  PLACED: { label: "განთავსებულია", color: "var(--warn)", fill: false },
-  CONFIRMED: { label: "დადასტურებულია", color: "var(--ok)", fill: false },
-  DELIVERED: { label: "მიწოდებულია", color: "var(--ok)", fill: true },
-  REJECTED: { label: "უარყოფილია", color: "var(--danger)", fill: true },
-  CANCELLED: { label: "გაუქმებულია", color: "var(--ink-muted)", fill: false },
+const STATUS: Record<OrderStatus, { label: string; color: string }> = {
+  PLACED: { label: "განთავსებულია", color: "var(--warn)" },
+  CONFIRMED: { label: "დადასტურებულია", color: "var(--accent)" },
+  DELIVERED: { label: "მიწოდებულია", color: "var(--ok)" },
+  REJECTED: { label: "უარყოფილია", color: "var(--danger)" },
+  CANCELLED: { label: "გაუქმებულია", color: "var(--ink-3)" },
 };
 
 export interface StatusDotProps {
   status: OrderStatus;
-  /** Hide the text label, show only the dot (with an accessible name). */
+  /** Show only the dot, with an accessible name. */
   dotOnly?: boolean;
   className?: string;
 }
 
+// 6px dot in the status colour + 6px gap + label at `small` in --ink-2.
+// Never a filled badge (DESIGN_SYSTEM.md §3, §6).
 export function StatusDot({ status, dotOnly = false, className }: StatusDotProps) {
   const meta = STATUS[status];
   return (
     <span
-      className={cn("inline-flex items-center gap-2 text-sm text-ink", className)}
+      className={cn("inline-flex items-center gap-1.5 text-small text-ink-2", className)}
       title={dotOnly ? meta.label : undefined}
     >
       <span
         aria-hidden="true"
-        className="h-2 w-2 shrink-0 rounded-full border"
-        style={{
-          borderColor: meta.color,
-          backgroundColor: meta.fill ? meta.color : "transparent",
-        }}
+        className="h-1.5 w-1.5 shrink-0 rounded-full"
+        style={{ backgroundColor: meta.color }}
       />
-      {dotOnly ? (
-        <span className="sr-only">{meta.label}</span>
-      ) : (
-        <span>{meta.label}</span>
-      )}
+      {dotOnly ? <span className="sr-only">{meta.label}</span> : <span>{meta.label}</span>}
     </span>
   );
 }

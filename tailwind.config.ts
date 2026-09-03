@@ -1,9 +1,9 @@
 import type { Config } from "tailwindcss";
 
 /**
- * Design tokens live in `app/globals.css` as CSS custom properties so they are
- * the single source of truth. Tailwind maps onto them here. Do not hard-code hex
- * values in components — reach for these token-backed utilities instead.
+ * Tokens live in app/globals.css as CSS custom properties. This file maps
+ * Tailwind utilities onto them and locks the type scale, spacing rhythm, radius
+ * set and the single shadow (DESIGN_SYSTEM.md §2–§4).
  */
 const config: Config = {
   content: [
@@ -12,58 +12,74 @@ const config: Config = {
     "./lib/**/*.{ts,tsx}",
   ],
   theme: {
-    // Deliberately small, calm scale. Sentence case only, never uppercase.
+    // Fixed type scale — nothing outside it (DESIGN_SYSTEM.md §2).
+    // [size, { lineHeight, fontWeight, letterSpacing }]
     fontSize: {
-      xs: ["0.75rem", { lineHeight: "1.5" }],
-      sm: ["0.8125rem", { lineHeight: "1.6" }],
-      base: ["0.9375rem", { lineHeight: "1.6" }],
-      lg: ["1.0625rem", { lineHeight: "1.5" }],
-      xl: ["1.25rem", { lineHeight: "1.4" }],
-      "2xl": ["1.5rem", { lineHeight: "1.3" }],
-      "3xl": ["1.9375rem", { lineHeight: "1.2" }],
+      micro: ["11px", { lineHeight: "16px", fontWeight: "500", letterSpacing: "0.01em" }],
+      small: ["13px", { lineHeight: "20px", fontWeight: "400" }],
+      body: ["15px", { lineHeight: "23px", fontWeight: "400" }],
+      strong: ["15px", { lineHeight: "23px", fontWeight: "500" }],
+      title: ["17px", { lineHeight: "24px", fontWeight: "500" }],
+      price: ["17px", { lineHeight: "22px", fontWeight: "700" }],
+      h3: ["20px", { lineHeight: "28px", fontWeight: "700" }],
+      h2: ["24px", { lineHeight: "32px", fontWeight: "700" }],
+      h1: ["30px", { lineHeight: "38px", fontWeight: "700" }],
     },
+    // Spacing rhythm — 4/8/12/16/24/32/48/64 only. These map onto Tailwind's
+    // default 1/2/3/4/6/8/12/16 steps; `row-y` is the one documented exception
+    // (14px search-result row padding, DESIGN_SYSTEM.md §5).
     extend: {
       colors: {
         paper: "var(--paper)",
-        surface: "var(--surface)",
+        surface: {
+          DEFAULT: "var(--surface)",
+          hover: "var(--surface-hover)",
+        },
         ink: {
           DEFAULT: "var(--ink)",
-          muted: "var(--ink-muted)",
+          2: "var(--ink-2)",
+          3: "var(--ink-3)",
         },
-        line: "var(--line)",
+        line: {
+          DEFAULT: "var(--line)",
+          strong: "var(--line-strong)",
+        },
         accent: {
           DEFAULT: "var(--accent)",
-          ink: "var(--accent-ink)",
+          soft: "var(--accent-soft)",
+          ring: "var(--accent-ring)",
         },
         ok: "var(--ok)",
         warn: "var(--warn)",
         danger: "var(--danger)",
       },
       fontFamily: {
-        sans: ["var(--font-firago)", "Noto Sans Georgian", "system-ui", "sans-serif"],
-      },
-      fontWeight: {
-        normal: "400",
-        medium: "500",
-        bold: "700",
-      },
-      borderRadius: {
-        sm: "4px",
-        DEFAULT: "6px",
-        md: "8px",
-        lg: "12px",
+        sans: [
+          "var(--font-sans)",
+          "Noto Sans Georgian",
+          "system-ui",
+          "sans-serif",
+        ],
       },
       spacing: {
-        // 44px minimum tap target, referenced directly by primitives.
-        tap: "2.75rem",
+        "row-y": "14px",
+      },
+      borderRadius: {
+        none: "0px",
+        sm: "6px",
+        DEFAULT: "6px",
+        md: "6px",
+        lg: "10px",
       },
       boxShadow: {
-        sheet: "0 -8px 40px -12px rgba(28, 27, 25, 0.18)",
-        modal: "0 24px 60px -12px rgba(28, 27, 25, 0.24)",
-        pop: "0 8px 28px -8px rgba(28, 27, 25, 0.18)",
+        none: "none",
+        float: "var(--shadow-float)",
       },
       transitionDuration: {
-        DEFAULT: "150ms",
+        DEFAULT: "120ms",
+      },
+      transitionTimingFunction: {
+        DEFAULT: "cubic-bezier(0, 0, 0.2, 1)", // ease-out
       },
     },
   },

@@ -15,6 +15,8 @@ export interface SelectProps
   placeholder?: string;
 }
 
+// Matches Input: 44px, --line-strong, radius 6, --ink border + accent ring on
+// focus (DESIGN_SYSTEM.md §6).
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   (
     { label, hint, error, options, placeholder, className, id, disabled, ...props },
@@ -29,18 +31,19 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         : undefined;
 
     return (
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-2">
         {label && (
-          <label htmlFor={selectId} className="text-sm font-medium text-ink">
+          <label htmlFor={selectId} className="text-strong text-ink">
             {label}
           </label>
         )}
         <div
           className={cn(
-            "relative flex h-tap items-center rounded-md border bg-surface transition-colors duration-150",
-            "focus-within:shadow-[var(--focus-ring)]",
-            error ? "border-danger" : "border-line",
-            disabled && "cursor-not-allowed bg-paper opacity-60",
+            "relative flex h-11 items-center rounded border bg-paper transition-colors",
+            error
+              ? "border-danger focus-within:shadow-[0_0_0_3px_var(--accent-ring)]"
+              : "border-line-strong focus-within:border-ink focus-within:shadow-[0_0_0_3px_var(--accent-ring)]",
+            disabled && "cursor-not-allowed bg-surface opacity-60",
           )}
         >
           <select
@@ -50,7 +53,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             aria-invalid={error ? true : undefined}
             aria-describedby={describedBy}
             className={cn(
-              "h-full w-full appearance-none bg-transparent px-3 pr-9 text-base text-ink outline-none disabled:cursor-not-allowed",
+              "h-full w-full appearance-none bg-transparent px-3 pr-9 text-body text-ink outline-none disabled:cursor-not-allowed",
               className,
             )}
             {...props}
@@ -67,7 +70,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ))}
           </select>
           <svg
-            className="pointer-events-none absolute right-3 h-4 w-4 text-ink-muted"
+            className="pointer-events-none absolute right-3 h-4 w-4 text-ink-3"
             viewBox="0 0 16 16"
             fill="none"
             aria-hidden="true"
@@ -82,11 +85,11 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           </svg>
         </div>
         {error ? (
-          <p id={`${selectId}-error`} className="text-sm text-danger">
+          <p id={`${selectId}-error`} className="text-small text-danger">
             {error}
           </p>
         ) : hint ? (
-          <p id={`${selectId}-hint`} className="text-sm text-ink-muted">
+          <p id={`${selectId}-hint`} className="text-small text-ink-3">
             {hint}
           </p>
         ) : null}

@@ -9,13 +9,15 @@ export interface StepperProps {
   max?: number;
   step?: number;
   disabled?: boolean;
-  /** Unit shown after the number, e.g. "თარო". */
+  /** Unit shown OUTSIDE the control, e.g. "თარო", "კგ". */
   unit?: string;
-  /** Accessible name for the whole control. */
+  /** Accessible name for the group. */
   label?: string;
-  size?: "sm" | "md";
 }
 
+// Single bordered enclosure, 36px tall. Value is tabular, centred, min 32px so
+// it does not jump between 1 and 10. Minus is disabled (not hidden) at the
+// minimum. Unit label sits outside in `micro` --ink-3 (DESIGN_SYSTEM.md §6).
 export function Stepper({
   value,
   onChange,
@@ -25,54 +27,53 @@ export function Stepper({
   disabled = false,
   unit,
   label = "რაოდენობა",
-  size = "md",
 }: StepperProps) {
   const dec = () => onChange(Math.max(min, value - step));
   const inc = () => onChange(Math.min(max, value + step));
   const atMin = disabled || value <= min;
   const atMax = disabled || value >= max;
 
+  // 36px tall (DESIGN_SYSTEM.md §6); 30px wide keeps the whole control inside a
+  // narrow results-row action cell.
   const btn =
-    "flex shrink-0 items-center justify-center text-ink transition-colors duration-150 hover:bg-[#f2f1ec] active:bg-[#e9e7e1] disabled:cursor-not-allowed disabled:text-ink-muted disabled:hover:bg-transparent focus-visible:outline-none";
-  const dims = size === "sm" ? "h-9 w-9" : "h-tap w-tap";
+    "flex h-9 w-[30px] shrink-0 items-center justify-center text-ink transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:text-ink-3 disabled:hover:bg-transparent focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent";
 
   return (
-    <div
-      role="group"
-      aria-label={label}
-      className={cn(
-        "inline-flex items-stretch overflow-hidden rounded-md border border-line bg-surface",
-        disabled && "opacity-60",
-      )}
-    >
-      <button
-        type="button"
-        onClick={dec}
-        disabled={atMin}
-        aria-label="შემცირება"
-        className={cn(btn, dims, "border-r border-line")}
-      >
-        <MinusIcon />
-      </button>
+    <div className="inline-flex items-center gap-2">
       <div
-        aria-live="polite"
+        role="group"
+        aria-label={label}
         className={cn(
-          "flex min-w-12 items-center justify-center gap-1 px-3 text-base font-medium tabular text-ink",
-          size === "sm" && "min-w-10 text-sm",
+          "inline-flex items-stretch overflow-hidden rounded border border-line-strong bg-paper",
+          disabled && "opacity-50",
         )}
       >
-        <span>{value}</span>
-        {unit && <span className="font-normal text-ink-muted">{unit}</span>}
+        <button
+          type="button"
+          onClick={dec}
+          disabled={atMin}
+          aria-label="შემცირება"
+          className={cn(btn, "border-r border-line-strong")}
+        >
+          <MinusIcon />
+        </button>
+        <div
+          aria-live="polite"
+          className="flex min-w-8 items-center justify-center px-2 text-strong tabular text-ink"
+        >
+          {value}
+        </div>
+        <button
+          type="button"
+          onClick={inc}
+          disabled={atMax}
+          aria-label="მომატება"
+          className={cn(btn, "border-l border-line-strong")}
+        >
+          <PlusIcon />
+        </button>
       </div>
-      <button
-        type="button"
-        onClick={inc}
-        disabled={atMax}
-        aria-label="მომატება"
-        className={cn(btn, dims, "border-l border-line")}
-      >
-        <PlusIcon />
-      </button>
+      {unit && <span className="text-micro text-ink-3">{unit}</span>}
     </div>
   );
 }

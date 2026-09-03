@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import { cn } from "./cn";
 
-type Variant = "primary" | "secondary" | "ghost" | "danger";
+type Variant = "primary" | "secondary" | "ghost" | "destructive";
 type Size = "sm" | "md" | "lg";
 
 export interface ButtonProps
@@ -9,27 +9,28 @@ export interface ButtonProps
   variant?: Variant;
   size?: Size;
   loading?: boolean;
-  /** Fill the available width. */
   block?: boolean;
 }
 
+// Radius 6, weight 500, horizontal padding 16. No shadow, no gradient, no
+// transform on hover — hover changes background only (DESIGN_SYSTEM.md §6).
 const base =
-  "inline-flex select-none items-center justify-center gap-2 rounded-md font-medium transition-colors duration-150 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-45";
+  "inline-flex select-none items-center justify-center gap-2 rounded px-4 font-medium leading-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-40";
 
 const variants: Record<Variant, string> = {
-  // --accent used here — one of only three places it appears.
-  primary: "bg-accent text-accent-ink hover:bg-[#6a1a25] active:bg-[#5c161f]",
+  primary: "bg-ink text-white hover:bg-[#26262b]",
   secondary:
-    "border border-line bg-surface text-ink hover:bg-paper active:bg-[#f2f1ec]",
-  ghost: "bg-transparent text-ink hover:bg-[#f2f1ec] active:bg-[#e9e7e1]",
-  danger:
-    "border border-danger/25 bg-surface text-danger hover:bg-danger/5 active:bg-danger/10",
+    "border border-line-strong bg-paper text-ink hover:bg-surface-hover",
+  ghost: "bg-transparent text-ink-2 hover:bg-surface-hover",
+  destructive:
+    "border border-danger/40 bg-paper text-danger hover:bg-danger/5",
 };
 
+// 32 / 40 / 44 (DESIGN_SYSTEM.md §6).
 const sizes: Record<Size, string> = {
-  sm: "h-9 px-3 text-sm",
-  md: "h-tap px-5 text-base",
-  lg: "h-12 px-6 text-lg",
+  sm: "h-8 text-small",
+  md: "h-10 text-strong",
+  lg: "h-11 text-strong",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(

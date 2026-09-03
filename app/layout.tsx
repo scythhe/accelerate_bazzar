@@ -1,5 +1,17 @@
 import type { Metadata, Viewport } from "next";
+import { Noto_Sans_Georgian } from "next/font/google";
 import "./globals.css";
+
+/**
+ * Noto Sans Georgian (variable), with a real Georgian subset drawn for the
+ * script plus Latin and numerals in the same family. Loaded here so Georgian
+ * text never falls back to a system font (see DESIGN_SYSTEM.md §2).
+ */
+const notoSansGeorgian = Noto_Sans_Georgian({
+  subsets: ["georgian", "latin"],
+  display: "swap",
+  variable: "--font-sans",
+});
 
 export const metadata: Metadata = {
   title: "Accelerate",
@@ -9,7 +21,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#fbfbf9",
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -18,8 +30,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ka">
-      <body className="min-h-dvh bg-paper text-ink antialiased">{children}</body>
+    <html lang="ka" className={notoSansGeorgian.variable}>
+      <body className="min-h-dvh bg-paper text-ink">{children}</body>
     </html>
   );
 }

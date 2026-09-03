@@ -14,6 +14,8 @@ export interface SheetProps {
   footer?: React.ReactNode;
 }
 
+// Floating surface: radius 10, the one shadow. Bottom sheet on mobile, centred
+// card from sm up (DESIGN_SYSTEM.md §4).
 export function Sheet({
   open,
   onClose,
@@ -56,7 +58,7 @@ export function Sheet({
         aria-hidden="true"
         tabIndex={-1}
         onClick={handleClose}
-        className="absolute inset-0 bg-ink/30 motion-safe:animate-[fade_150ms_ease-out]"
+        className="absolute inset-0 bg-ink/25"
       />
       <div
         ref={panelRef}
@@ -65,25 +67,23 @@ export function Sheet({
         aria-label={title}
         tabIndex={-1}
         className={cn(
-          "relative z-10 flex max-h-[90dvh] w-full flex-col bg-surface shadow-sheet outline-none",
-          // bottom sheet on mobile …
-          "mt-auto rounded-t-lg motion-safe:animate-[slideUp_180ms_ease-out]",
-          // … centered card from sm up
-          "sm:m-auto sm:max-w-md sm:rounded-lg sm:shadow-modal sm:motion-safe:animate-[pop_150ms_ease-out]",
+          "relative z-10 flex max-h-[90dvh] w-full flex-col bg-paper shadow-float outline-none",
+          "mt-auto rounded-t-lg",
+          "sm:m-auto sm:max-w-md sm:rounded-lg",
         )}
       >
-        <header className="flex items-start justify-between gap-4 border-b border-line px-5 py-4">
+        <header className="flex items-start justify-between gap-4 border-b border-line px-4 py-4">
           <div>
-            <h2 className="text-lg font-bold text-ink">{title}</h2>
+            <h2 className="text-h3 text-ink">{title}</h2>
             {description && (
-              <p className="mt-0.5 text-sm text-ink-muted">{description}</p>
+              <p className="mt-0.5 text-small text-ink-2">{description}</p>
             )}
           </div>
           <button
             type="button"
             onClick={handleClose}
             aria-label="დახურვა"
-            className="-mr-2 -mt-1 flex h-tap w-tap shrink-0 items-center justify-center rounded-md text-ink-muted hover:bg-paper focus-visible:outline-none"
+            className="-mr-2 -mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded text-ink-3 transition-colors hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent"
           >
             <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden="true">
               <path
@@ -96,22 +96,16 @@ export function Sheet({
           </button>
         </header>
 
-        <div className="flex-1 overflow-y-auto px-5 py-4 text-base text-ink">
+        <div className="flex-1 overflow-y-auto px-4 py-4 text-body text-ink">
           {children}
         </div>
 
         {footer && (
-          <footer className="flex items-center justify-end gap-3 border-t border-line px-5 py-4">
+          <footer className="flex items-center justify-end gap-3 border-t border-line px-4 py-4">
             {footer}
           </footer>
         )}
       </div>
-
-      <style>{`
-        @keyframes fade { from { opacity: 0 } to { opacity: 1 } }
-        @keyframes slideUp { from { transform: translateY(100%) } to { transform: translateY(0) } }
-        @keyframes pop { from { opacity: 0; transform: scale(0.97) } to { opacity: 1; transform: scale(1) } }
-      `}</style>
     </div>,
     document.body,
   );

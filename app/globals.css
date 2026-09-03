@@ -1,35 +1,36 @@
-/* FiraGO — single family, drawn with Georgian and Latin together so Mkhedruli,
-   Latin and numerals share one rhythm. Noto Sans Georgian is the fallback. */
-@import "@fontsource/firago/400.css";
-@import "@fontsource/firago/500.css";
-@import "@fontsource/firago/700.css";
-@import "@fontsource/noto-sans-georgian/400.css";
-@import "@fontsource/noto-sans-georgian/500.css";
-@import "@fontsource/noto-sans-georgian/700.css";
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ---------------------------------------------------------------------------
-   Design tokens. Single source of truth. Tailwind (tailwind.config.ts) maps
-   utilities onto these; components never hard-code colour.
+   Design tokens — single source of truth (DESIGN_SYSTEM.md §3, §4).
+   Tailwind (tailwind.config.ts) maps utilities onto these. Components never
+   hard-code colour, radius or shadow.
    --------------------------------------------------------------------------- */
 :root {
-  --paper: #fbfbf9; /* page background */
-  --surface: #ffffff; /* rows, sheets, panels */
-  --ink: #1c1b19; /* primary text */
-  --ink-muted: #6b6862; /* units, secondary labels */
-  --line: #e4e2dc; /* dividers, borders */
-  --accent: #7a1f2b; /* placeholder — Accelerate brand colour */
-  --accent-ink: #ffffff; /* text on accent surfaces */
-  --ok: #1f6b3f; /* confirmed, available */
-  --warn: #a66300; /* pending, below minimum */
-  --danger: #a32020; /* rejected, destructive */
+  --paper: #ffffff; /* page background */
+  --surface: #fafafa; /* panels, table header, inset areas */
+  --surface-hover: #f4f4f5; /* row hover */
 
-  --font-firago: "FiraGO";
+  --ink: #0f0f10; /* primary text, primary buttons */
+  --ink-2: #52525b; /* secondary text, supplier name */
+  --ink-3: #a1a1aa; /* tertiary — units, per-unit price, placeholders */
 
-  --focus-ring: 0 0 0 2px var(--paper), 0 0 0 4px var(--accent);
+  --line: #e8e8eb; /* default borders and dividers */
+  --line-strong: #d4d4d8; /* input borders, emphasised dividers */
+
+  /* --accent — Accelerate brand colour. DESIGN_SYSTEM.md leaves this as a
+     placeholder (#XXXXXX); #1A56DB is a stand-in. Change here only. */
+  --accent: #1a56db;
+  --accent-soft: rgb(26 86 219 / 0.08); /* selected chip / row background */
+  --accent-ring: rgb(26 86 219 / 0.2); /* 3px focus ring */
+
+  --ok: #15803d;
+  --warn: #b45309;
+  --danger: #b91c1c;
+
+  /* The one shadow. Floating surfaces only. */
+  --shadow-float: 0 1px 3px rgb(0 0 0 / 0.06), 0 8px 24px rgb(0 0 0 / 0.08);
 }
 
 @layer base {
@@ -40,18 +41,19 @@
   body {
     background-color: var(--paper);
     color: var(--ink);
-    font-family: var(--font-firago), "Noto Sans Georgian", system-ui, sans-serif;
+    font-family: var(--font-sans), "Noto Sans Georgian", system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 23px;
     font-weight: 400;
-    line-height: 1.6; /* Georgian suffocates below this */
+    letter-spacing: 0; /* Georgian gets no tracking */
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
 
-  /* Never transform case. Georgian has no case; Mtavruli is a style, not a
-     transform. Sentence case everywhere. */
+  /* Georgian is unicameral — case transforms do nothing to it and look broken
+     next to it. Kill them everywhere, including headers and buttons. */
   * {
     text-transform: none !important;
-    letter-spacing: normal; /* do not tighten Georgian */
   }
 
   h1,
@@ -59,31 +61,33 @@
   h3,
   h4 {
     font-weight: 700;
-    line-height: 1.25;
-  }
-
-  /* Visible keyboard focus everywhere. */
-  :focus-visible {
-    outline: none;
-    box-shadow: var(--focus-ring);
-    border-radius: 4px;
+    letter-spacing: 0;
   }
 
   ::placeholder {
-    color: var(--ink-muted);
+    color: var(--ink-3);
     opacity: 1;
+  }
+
+  /* Visible keyboard focus on every interactive element. Inputs override with a
+     border + ring pair (see components). */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+    border-radius: 6px;
   }
 }
 
 @layer utilities {
-  /* Prices and quantities must align down a column or scanning is impossible. */
+  /* Prices, quantities and numeric inputs — decimals must align down a column. */
   .tabular {
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum" 1;
   }
 }
 
-/* Motion only as feedback for a user action. Honour the OS setting. */
+/* Motion is feedback only. No entrance animation, no scroll reveal, no skeleton
+   shimmer. Honour the OS setting. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

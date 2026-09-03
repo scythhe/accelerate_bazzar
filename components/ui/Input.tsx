@@ -8,10 +8,17 @@ export interface InputProps
   error?: string;
   /** Short leading adornment, e.g. "+995" or "₾". */
   leading?: React.ReactNode;
+  /** Tabular figures — set for any numeric field. */
+  numeric?: boolean;
 }
 
+// 44px height, 1px --line-strong, radius 6, 12px horizontal padding.
+// Focus: 1px --ink border + 3px --accent ring at 20% (DESIGN_SYSTEM.md §6).
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, hint, error, leading, className, id, disabled, ...props }, ref) => {
+  (
+    { label, hint, error, leading, numeric, className, id, disabled, ...props },
+    ref,
+  ) => {
     const autoId = useId();
     const inputId = id ?? autoId;
     const describedBy = error
@@ -21,25 +28,23 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         : undefined;
 
     return (
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-2">
         {label && (
-          <label
-            htmlFor={inputId}
-            className="text-sm font-medium text-ink"
-          >
+          <label htmlFor={inputId} className="text-strong text-ink">
             {label}
           </label>
         )}
         <div
           className={cn(
-            "flex h-tap items-center gap-2 rounded-md border bg-surface px-3 transition-colors duration-150",
-            "focus-within:shadow-[var(--focus-ring)]",
-            error ? "border-danger" : "border-line",
-            disabled && "cursor-not-allowed bg-paper opacity-60",
+            "flex h-11 items-center gap-2 rounded border bg-paper px-3 transition-colors",
+            error
+              ? "border-danger focus-within:shadow-[0_0_0_3px_var(--accent-ring)]"
+              : "border-line-strong focus-within:border-ink focus-within:shadow-[0_0_0_3px_var(--accent-ring)]",
+            disabled && "cursor-not-allowed bg-surface opacity-60",
           )}
         >
           {leading && (
-            <span className="shrink-0 text-base text-ink-muted tabular">
+            <span className="shrink-0 text-body text-ink-3 tabular">
               {leading}
             </span>
           )}
@@ -50,18 +55,19 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             aria-invalid={error ? true : undefined}
             aria-describedby={describedBy}
             className={cn(
-              "h-full w-full bg-transparent text-base text-ink outline-none placeholder:text-ink-muted disabled:cursor-not-allowed",
+              "h-full w-full bg-transparent text-body text-ink outline-none placeholder:text-ink-3 disabled:cursor-not-allowed",
+              numeric && "tabular",
               className,
             )}
             {...props}
           />
         </div>
         {error ? (
-          <p id={`${inputId}-error`} className="text-sm text-danger">
+          <p id={`${inputId}-error`} className="text-small text-danger">
             {error}
           </p>
         ) : hint ? (
-          <p id={`${inputId}-hint`} className="text-sm text-ink-muted">
+          <p id={`${inputId}-hint`} className="text-small text-ink-3">
             {hint}
           </p>
         ) : null}

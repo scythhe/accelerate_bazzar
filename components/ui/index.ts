@@ -10,4 +10,5 @@ export {
 export { StatusDot, type StatusDotProps, type OrderStatus } from "./StatusDot";
 export { Sheet, type SheetProps } from "./Sheet";
 export { TableRow, type TableRowProps } from "./TableRow";
+export { gel, gelPerUnit } from "./format";
 export { cn } from "./cn";
