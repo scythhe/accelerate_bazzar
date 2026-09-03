@@ -1,9 +1,10 @@
 import type {
+  BaseUnit,
   CanonicalItem,
   Order,
+  Organization,
   Supplier,
   SupplierProduct,
-  Organization,
 } from "./types";
 
 // ---------------------------------------------------------------------------
@@ -131,10 +132,9 @@ export const SUPPLIERS: Supplier[] = [
   },
 ];
 
-export const supplierById = (id: string) =>
+export const supplierById = (id: string): Supplier =>
   SUPPLIERS.find((s) => s.id === id) ??
   ({
-    // fallback so a stale id never crashes the demo
     id,
     type: "SUPPLIER",
     legalName: id,
@@ -149,265 +149,559 @@ export const supplierById = (id: string) =>
   } as Supplier);
 
 // ---------------------------------------------------------------------------
-// Canonical catalogue
+// Catalogue seed — one line per canonical item. The builder below fans each out
+// to `spread` suppliers with deterministic, genuinely different prices.
 // ---------------------------------------------------------------------------
 
-export const CANONICAL_ITEMS: CanonicalItem[] = [
+interface Pack {
+  label: string;
+  qty: number;
+}
+const P = (label: string, qty: number): Pack => ({ label, qty });
+
+interface Seed {
+  slug: string;
+  cat: string;
+  catLabel: string;
+  nameKa: string;
+  unit: BaseUnit;
+  pack: Pack;
+  base: number; // reference price per pack, GEL
+  spread: number; // how many suppliers carry it
+  terms: string[]; // extra search terms
+  variants?: string[]; // supplier naming variants
+  prices?: Record<number, number>; // pin specific supplier-index prices
+}
+
+const SEEDS: Seed[] = [
+  // eggs — every supplier carries eggs; the demo pins the first three prices
   {
-    id: "can-eggs",
-    category: "eggs",
-    categoryLabel: "კვერცხი",
-    nameKa: "ქათმის კვერცხი",
-    baseUnit: "ცალი",
-    searchTerms: [
-      "კვერცხი",
-      "კვერცხის",
-      "კვერცხები",
-      "კვ",
-      "kvercxi",
-      "kvertskhi",
-      "kvercxi",
-      "яйца",
-      "яйцо",
-      "egg",
-      "eggs",
+    slug: "eggs",
+    cat: "eggs",
+    catLabel: "კვერცხი",
+    nameKa: "ქათმის კვერცხი C1",
+    unit: "ცალი",
+    pack: P("თარო (30 ცალი)", 30),
+    base: 12,
+    spread: 8,
+    terms: ["კვერცხი", "კვერცხის", "kvercxi", "kvertskhi", "яйца", "egg", "eggs"],
+    variants: [
+      "კვერცხი C1, თეთრი",
+      "ქათმის კვერცხი C1",
+      "კვერცხი C1",
+      "კვერცხი C0, შინაური",
+      "კვერცხი C2, მსხვილი",
+      "კვერცხი C1, ყავისფერი",
     ],
+    prices: { 0: 12.0, 1: 12.6, 2: 11.8 },
   },
+
+  // ბოსტნეული
   {
-    id: "can-onion",
-    category: "veg",
-    categoryLabel: "ბოსტნეული",
+    slug: "onion",
+    cat: "veg",
+    catLabel: "ბოსტნეული",
     nameKa: "ხახვი",
-    baseUnit: "კგ",
-    searchTerms: [
-      "ხახვი",
-      "ხახვის",
-      "khakhvi",
-      "xaxvi",
-      "лук",
-      "onion",
-      "onions",
-    ],
+    unit: "კგ",
+    pack: P("ტომარა 25 კგ", 25),
+    base: 30,
+    spread: 7,
+    terms: ["ხახვი", "ხახვის", "onion", "лук"],
+    variants: ["ხახვი, ყვითელი", "ხახვი", "ხახვი, ადგილობრივი", "ხახვი, წითელი"],
   },
   {
-    id: "can-potato",
-    category: "veg",
-    categoryLabel: "ბოსტნეული",
+    slug: "potato",
+    cat: "veg",
+    catLabel: "ბოსტნეული",
     nameKa: "კარტოფილი",
-    baseUnit: "კგ",
-    searchTerms: [
+    unit: "კგ",
+    pack: P("ტომარა 25 კგ", 25),
+    base: 42,
+    spread: 7,
+    terms: ["კარტოფილი", "kartopili", "potato", "картофель"],
+    variants: [
       "კარტოფილი",
-      "კარტოფილის",
-      "kartopili",
-      "картофель",
-      "potato",
-      "potatoes",
+      "კარტოფილი, ახალი",
+      "კარტოფილი, სამარხვო",
+      "კარტოფილი, მსხვილი",
     ],
   },
   {
-    id: "can-pickle",
-    category: "pickle",
-    categoryLabel: "მწნილი",
-    nameKa: "კიტრი მწნილი",
-    baseUnit: "კგ",
-    searchTerms: [
-      "მწნილი",
-      "მწნილის",
-      "კიტრი მწნილი",
-      "მარილწყალი",
-      "mtsnili",
-      "mwnili",
-      "соленья",
-      "огурцы",
-      "pickle",
-      "pickles",
-      "pickled",
-    ],
+    slug: "carrot",
+    cat: "veg",
+    catLabel: "ბოსტნეული",
+    nameKa: "სტაფილო",
+    unit: "კგ",
+    pack: P("ტომარა 20 კგ", 20),
+    base: 26,
+    spread: 3,
+    terms: ["სტაფილო", "stapilo", "carrot", "морковь"],
   },
   {
-    id: "can-oil",
-    category: "oil",
-    categoryLabel: "ზეთი",
-    nameKa: "მზესუმზირის ზეთი",
-    baseUnit: "ლ",
-    searchTerms: [
-      "ზეთი",
-      "ზეთის",
-      "მზესუმზირის ზეთი",
-      "მცენარეული ზეთი",
-      "zeti",
-      "zethi",
-      "масло",
-      "подсолнечное",
-      "oil",
-      "sunflower oil",
-    ],
+    slug: "cabbage",
+    cat: "veg",
+    catLabel: "ბოსტნეული",
+    nameKa: "კომბოსტო",
+    unit: "კგ",
+    pack: P("ბადე 12 კგ", 12),
+    base: 15,
+    spread: 2,
+    terms: ["კომბოსტო", "kombosto", "cabbage", "капуста"],
   },
   {
-    id: "can-sulguni",
-    category: "dairy",
-    categoryLabel: "რძის ნაწარმი",
+    slug: "tomato",
+    cat: "veg",
+    catLabel: "ბოსტნეული",
+    nameKa: "პომიდორი",
+    unit: "კგ",
+    pack: P("ყუთი 10 კგ", 10),
+    base: 34,
+    spread: 3,
+    terms: ["პომიდორი", "pomidori", "tomato", "помидоры"],
+  },
+  {
+    slug: "cucumber",
+    cat: "veg",
+    catLabel: "ბოსტნეული",
+    nameKa: "კიტრი",
+    unit: "კგ",
+    pack: P("ყუთი 10 კგ", 10),
+    base: 30,
+    spread: 2,
+    terms: ["კიტრი", "kitri", "cucumber", "огурцы"],
+  },
+  {
+    slug: "garlic",
+    cat: "veg",
+    catLabel: "ბოსტნეული",
+    nameKa: "ნიორი",
+    unit: "კგ",
+    pack: P("ბადე 5 კგ", 5),
+    base: 45,
+    spread: 2,
+    terms: ["ნიორი", "niori", "garlic", "чеснок"],
+  },
+  {
+    slug: "greens",
+    cat: "veg",
+    catLabel: "ბოსტნეული",
+    nameKa: "მწვანილი",
+    unit: "კგ",
+    pack: P("ყუთი 3 კგ", 3),
+    base: 24,
+    spread: 2,
+    terms: ["მწვანილი", "mtsvanili", "greens", "herbs", "зелень"],
+    variants: ["ოხრახუში და ქინძი", "მწვანილის ასორტი"],
+  },
+
+  // ხილი
+  {
+    slug: "apple",
+    cat: "fruit",
+    catLabel: "ხილი",
+    nameKa: "ვაშლი",
+    unit: "კგ",
+    pack: P("ყუთი 13 კგ", 13),
+    base: 33,
+    spread: 3,
+    terms: ["ვაშლი", "vashli", "apple", "яблоки"],
+  },
+  {
+    slug: "lemon",
+    cat: "fruit",
+    catLabel: "ხილი",
+    nameKa: "ლიმონი",
+    unit: "კგ",
+    pack: P("ყუთი 10 კგ", 10),
+    base: 42,
+    spread: 2,
+    terms: ["ლიმონი", "limoni", "lemon", "лимоны"],
+  },
+  {
+    slug: "banana",
+    cat: "fruit",
+    catLabel: "ხილი",
+    nameKa: "ბანანი",
+    unit: "კგ",
+    pack: P("ყუთი 18 კგ", 18),
+    base: 45,
+    spread: 2,
+    terms: ["ბანანი", "banani", "banana", "бананы"],
+  },
+  {
+    slug: "orange",
+    cat: "fruit",
+    catLabel: "ხილი",
+    nameKa: "ფორთოხალი",
+    unit: "კგ",
+    pack: P("ბადე 15 კგ", 15),
+    base: 38,
+    spread: 2,
+    terms: ["ფორთოხალი", "portoxali", "orange", "апельсины"],
+  },
+
+  // რძის ნაწარმი
+  {
+    slug: "sulguni",
+    cat: "dairy",
+    catLabel: "რძის ნაწარმი",
     nameKa: "სულგუნი",
-    baseUnit: "კგ",
-    searchTerms: [
+    unit: "კგ",
+    pack: P("ბლოკი ~2 კგ", 2),
+    base: 34,
+    spread: 7,
+    terms: ["სულგუნი", "ყველი", "sulguni", "сыр", "cheese"],
+    variants: [
       "სულგუნი",
-      "სულგუნის",
-      "ყველი",
-      "sulguni",
-      "сулугуни",
-      "сыр",
-      "cheese",
+      "სულგუნი, საღორის რძის",
+      "სულგუნი, სოფლის",
+      "სულგუნი, შებოლილი",
     ],
+  },
+  {
+    slug: "imeruli",
+    cat: "dairy",
+    catLabel: "რძის ნაწარმი",
+    nameKa: "იმერული ყველი",
+    unit: "კგ",
+    pack: P("თავი ~1.5 კგ", 1.5),
+    base: 26,
+    spread: 3,
+    terms: ["იმერული", "ყველი", "imeruli", "cheese"],
+    variants: ["იმერული ყველი", "ყველი იმერული, ახალი"],
+  },
+  {
+    slug: "butter",
+    cat: "dairy",
+    catLabel: "რძის ნაწარმი",
+    nameKa: "კარაქი",
+    unit: "კგ",
+    pack: P("ბლოკი 1 კგ", 1),
+    base: 22,
+    spread: 3,
+    terms: ["კარაქი", "karaqi", "butter", "масло"],
+    variants: ["კარაქი 82%", "კარაქი, ფერმის"],
+  },
+  {
+    slug: "matsoni",
+    cat: "dairy",
+    catLabel: "რძის ნაწარმი",
+    nameKa: "მაწონი",
+    unit: "ცალი",
+    pack: P("ლანგარი (12 ცალი)", 12),
+    base: 24,
+    spread: 3,
+    terms: ["მაწონი", "matsoni", "yogurt", "мацони"],
+  },
+  {
+    slug: "smetana",
+    cat: "dairy",
+    catLabel: "რძის ნაწარმი",
+    nameKa: "არაჟანი",
+    unit: "კგ",
+    pack: P("ვედრო 5 კგ", 5),
+    base: 30,
+    spread: 2,
+    terms: ["არაჟანი", "arajani", "sour cream", "сметана"],
+  },
+  {
+    slug: "xacho",
+    cat: "dairy",
+    catLabel: "რძის ნაწარმი",
+    nameKa: "ხაჭო",
+    unit: "კგ",
+    pack: P("ვედრო 5 კგ", 5),
+    base: 28,
+    spread: 2,
+    terms: ["ხაჭო", "xacho", "cottage", "творог"],
+  },
+  {
+    slug: "milk",
+    cat: "dairy",
+    catLabel: "რძის ნაწარმი",
+    nameKa: "რძე",
+    unit: "ლ",
+    pack: P("ყუთი (12 × 1 ლ)", 12),
+    base: 30,
+    spread: 3,
+    terms: ["რძე", "rdze", "milk", "молоко"],
+  },
+
+  // ხორცი
+  {
+    slug: "chicken",
+    cat: "meat",
+    catLabel: "ხორცი",
+    nameKa: "ქათმის ხორცი",
+    unit: "კგ",
+    pack: P("ყუთი 10 კგ", 10),
+    base: 85,
+    spread: 3,
+    terms: ["ქათამი", "ქათმის ხორცი", "katami", "chicken", "курица"],
+    variants: ["ქათმის ხორცი, მთლიანი", "ქათმის ბარკალი"],
+  },
+  {
+    slug: "chicken-fillet",
+    cat: "meat",
+    catLabel: "ხორცი",
+    nameKa: "ქათმის ფილე",
+    unit: "კგ",
+    pack: P("ყუთი 10 კგ", 10),
+    base: 105,
+    spread: 3,
+    terms: ["ფილე", "ქათმის ფილე", "file", "fillet", "филе"],
+  },
+  {
+    slug: "pork",
+    cat: "meat",
+    catLabel: "ხორცი",
+    nameKa: "ღორის ხორცი",
+    unit: "კგ",
+    pack: P("ყუთი 15 კგ", 15),
+    base: 130,
+    spread: 3,
+    terms: ["ღორის ხორცი", "ღორი", "gori", "pork", "свинина"],
+  },
+  {
+    slug: "beef",
+    cat: "meat",
+    catLabel: "ხორცი",
+    nameKa: "საქონლის ხორცი",
+    unit: "კგ",
+    pack: P("ყუთი 15 კგ", 15),
+    base: 170,
+    spread: 2,
+    terms: ["საქონლის ხორცი", "saqonli", "beef", "говядина"],
+  },
+
+  // საცხობი / ბაზისი
+  {
+    slug: "flour",
+    cat: "bakery",
+    catLabel: "საცხობი",
+    nameKa: "ფქვილი",
+    unit: "კგ",
+    pack: P("ტომარა 50 კგ", 50),
+    base: 105,
+    spread: 4,
+    terms: ["ფქვილი", "ფქვილის", "pqvili", "flour", "мука"],
+    variants: ["ფქვილი, უმაღლესი ხარისხი", "ფქვილი, პურის"],
+  },
+  {
+    slug: "sugar",
+    cat: "bakery",
+    catLabel: "საცხობი",
+    nameKa: "შაქარი",
+    unit: "კგ",
+    pack: P("ტომარა 50 კგ", 50),
+    base: 130,
+    spread: 3,
+    terms: ["შაქარი", "shaqari", "sugar", "сахар"],
+  },
+  {
+    slug: "salt",
+    cat: "bakery",
+    catLabel: "საცხობი",
+    nameKa: "მარილი",
+    unit: "კგ",
+    pack: P("ტომარა 25 კგ", 25),
+    base: 20,
+    spread: 3,
+    terms: ["მარილი", "marili", "salt", "соль"],
+  },
+  {
+    slug: "rice",
+    cat: "bakery",
+    catLabel: "საცხობი",
+    nameKa: "ბრინჯი",
+    unit: "კგ",
+    pack: P("ტომარა 25 კგ", 25),
+    base: 78,
+    spread: 3,
+    terms: ["ბრინჯი", "brinji", "rice", "рис"],
+  },
+  {
+    slug: "pasta",
+    cat: "bakery",
+    catLabel: "საცხობი",
+    nameKa: "მაკარონი",
+    unit: "კგ",
+    pack: P("ყუთი 10 კგ", 10),
+    base: 32,
+    spread: 3,
+    terms: ["მაკარონი", "makaroni", "pasta", "макароны"],
+  },
+  {
+    slug: "yeast",
+    cat: "bakery",
+    catLabel: "საცხობი",
+    nameKa: "საფუარი",
+    unit: "კგ",
+    pack: P("ყუთი 5 კგ", 5),
+    base: 45,
+    spread: 2,
+    terms: ["საფუარი", "sapuari", "yeast", "дрожжи"],
+  },
+
+  // ზეთი / სოუსი
+  {
+    slug: "oil-sunflower",
+    cat: "oil",
+    catLabel: "ზეთი",
+    nameKa: "მზესუმზირის ზეთი",
+    unit: "ლ",
+    pack: P("ბიდონი 5 ლ", 5),
+    base: 38,
+    spread: 7,
+    terms: ["ზეთი", "ზეთის", "მზესუმზირის ზეთი", "zeti", "oil", "масло"],
+    variants: ["მზესუმზირის ზეთი", "მზესუმზირის ზეთი, რაფინირებული"],
+  },
+  {
+    slug: "oil-olive",
+    cat: "oil",
+    catLabel: "ზეთი",
+    nameKa: "ზეითუნის ზეთი",
+    unit: "ლ",
+    pack: P("ბოთლი 1 ლ", 1),
+    base: 28,
+    spread: 3,
+    terms: ["ზეითუნის ზეთი", "ზეთი", "olive oil", "оливковое"],
+  },
+
+  // მწნილი
+  {
+    slug: "pickle-cucumber",
+    cat: "pickle",
+    catLabel: "მწნილი",
+    nameKa: "კიტრი მწნილი",
+    unit: "კგ",
+    pack: P("ვედრო 10 კგ", 10),
+    base: 45,
+    spread: 3,
+    terms: ["მწნილი", "კიტრი მწნილი", "mtsnili", "pickle", "соленья"],
+    variants: ["კიტრი მწნილი", "კიტრი მწნილი, კახური"],
+  },
+  {
+    slug: "jonjoli",
+    cat: "pickle",
+    catLabel: "მწნილი",
+    nameKa: "ჯონჯოლი",
+    unit: "კგ",
+    pack: P("ვედრო 5 კგ", 5),
+    base: 42,
+    spread: 3,
+    terms: ["ჯონჯოლი", "მწნილი", "jonjoli", "pickle"],
+  },
+  {
+    slug: "pickled-cabbage",
+    cat: "pickle",
+    catLabel: "მწნილი",
+    nameKa: "კომბოსტო მწნილი",
+    unit: "კგ",
+    pack: P("ვედრო 10 კგ", 10),
+    base: 30,
+    spread: 2,
+    terms: ["კომბოსტო მწნილი", "მწნილი", "pickled cabbage"],
   },
 ];
+
+// ---------------------------------------------------------------------------
+// Builder — deterministic so server and client render identically.
+// ---------------------------------------------------------------------------
+
+/** per-supplier price multiplier, aligned to SUPPLIERS index */
+const FACTOR = [1.0, 1.05, 0.95, 1.09, 1.02, 0.92, 1.12, 0.985];
+
+function hash(s: string): number {
+  let x = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    x ^= s.charCodeAt(i);
+    x = Math.imul(x, 16777619);
+  }
+  return x >>> 0;
+}
+
+function priceFor(seed: Seed, supIdx: number): number {
+  const pinned = seed.prices?.[supIdx];
+  if (pinned != null) return pinned;
+  const jitter = ((hash(`${seed.slug}:${supIdx}`) % 13) - 6) / 100; // ±6%
+  const raw = seed.base * FACTOR[supIdx] * (1 + jitter);
+  if (seed.base < 10) return Math.round(raw * 10) / 10;
+  if (seed.base < 30) return Math.round(raw * 2) / 2;
+  if (seed.base < 100) return Math.round(raw);
+  return Math.round(raw / 5) * 5;
+}
+
+function carriers(seed: Seed): number[] {
+  const start = hash(seed.slug) % SUPPLIERS.length;
+  const n = Math.min(seed.spread, SUPPLIERS.length);
+  return Array.from({ length: n }, (_, k) => (start + k) % SUPPLIERS.length);
+}
+
+export const CANONICAL_ITEMS: CanonicalItem[] = SEEDS.map((s) => ({
+  id: `can-${s.slug}`,
+  category: s.cat,
+  categoryLabel: s.catLabel,
+  nameKa: s.nameKa,
+  baseUnit: s.unit,
+  searchTerms: Array.from(new Set([s.nameKa, s.catLabel, s.cat, ...s.terms])),
+}));
 
 export const canonicalById = (id: string) =>
   CANONICAL_ITEMS.find((c) => c.id === id);
 
-// ---------------------------------------------------------------------------
-// Supplier products
-// ---------------------------------------------------------------------------
+const built: SupplierProduct[] = [];
+let _gi = 0;
+for (const s of SEEDS) {
+  carriers(s).forEach((supIdx, k) => {
+    const id = `p-${s.slug}-${supIdx}`;
+    const name =
+      s.variants && s.variants.length
+        ? s.variants[k % s.variants.length]
+        : s.nameKa;
+    // ~1 in 3 products carries no image_url at all → letter-tile fallback.
+    const imageUrl = _gi % 3 === 0 ? undefined : `/products/${s.slug}.jpg`;
+    built.push({
+      id,
+      supplierId: SUPPLIERS[supIdx].id,
+      canonicalItemId: `can-${s.slug}`,
+      nameKa: name,
+      baseUnit: s.unit,
+      packLabel: s.pack.label,
+      packQuantity: s.pack.qty,
+      pricePerPack: priceFor(s, supIdx),
+      isAvailable: hash(`${id}:avail`) % 11 !== 0,
+      imageUrl,
+    });
+    _gi++;
+  });
+}
 
-type EggSeed = {
-  supplierId: string;
-  nameKa: string;
-  pricePerPack: number;
-  available?: boolean;
-};
-
-const EGG_SEED: EggSeed[] = [
-  { supplierId: "sup-agro", nameKa: "კვერცხი C1, თეთრი", pricePerPack: 12.0 },
-  { supplierId: "sup-food", nameKa: "ქათმის კვერცხი C1", pricePerPack: 12.6 },
-  { supplierId: "sup-gemo", nameKa: "კვერცხი C1", pricePerPack: 11.8 },
-  { supplierId: "sup-natura", nameKa: "კვერცხი C0, შინაური", pricePerPack: 13.2 },
-  { supplierId: "sup-lider", nameKa: "კვერცხი C1, ყავისფერი", pricePerPack: 12.4 },
-  { supplierId: "sup-bio", nameKa: "კვერცხი C2", pricePerPack: 11.5 },
-  {
-    supplierId: "sup-fresh",
-    nameKa: "კვერცხი C0, პრემიუმ",
-    pricePerPack: 13.8,
-    available: false,
-  },
-  { supplierId: "sup-kakhuri", nameKa: "ქათმის კვერცხი C1", pricePerPack: 12.1 },
-];
-
-const eggProducts: SupplierProduct[] = EGG_SEED.map((e, i) => ({
-  id: `p-egg-${i + 1}`,
-  supplierId: e.supplierId,
-  canonicalItemId: "can-eggs",
-  nameKa: e.nameKa,
-  baseUnit: "ცალი",
-  packLabel: "თარო (30 ცალი)",
-  packQuantity: 30,
-  pricePerPack: e.pricePerPack,
-  isAvailable: e.available ?? true,
-}));
-
-const onionProducts: SupplierProduct[] = [
-  ["sup-agro", "ხახვი, ყვითელი", 30.0],
-  ["sup-gemo", "ხახვი", 27.5],
-  ["sup-bio", "ხახვი, ადგილობრივი", 33.0],
-  ["sup-kakhuri", "ხახვი, ყვითელი", 29.0],
-].map(([supplierId, nameKa, price], i) => ({
-  id: `p-onion-${i + 1}`,
-  supplierId: supplierId as string,
-  canonicalItemId: "can-onion",
-  nameKa: nameKa as string,
-  baseUnit: "კგ",
-  packLabel: "ტომარა 25 კგ",
-  packQuantity: 25,
-  pricePerPack: price as number,
-  isAvailable: true,
-}));
-
-const potatoProducts: SupplierProduct[] = [
-  ["sup-agro", "კარტოფილი", 42.5],
-  ["sup-natura", "კარტოფილი, ახალი", 46.0],
-  ["sup-kakhuri", "კარტოფილი", 40.0],
-].map(([supplierId, nameKa, price], i) => ({
-  id: `p-potato-${i + 1}`,
-  supplierId: supplierId as string,
-  canonicalItemId: "can-potato",
-  nameKa: nameKa as string,
-  baseUnit: "კგ",
-  packLabel: "ტომარა 25 კგ",
-  packQuantity: 25,
-  pricePerPack: price as number,
-  isAvailable: true,
-}));
-
-const pickleProducts: SupplierProduct[] = [
-  ["sup-gemo", "კიტრი მწნილი", 45.0],
-  ["sup-kakhuri", "კიტრი მწნილი, კახური", 52.0],
-  ["sup-food", "ჯონჯოლი და კიტრი, ასორტი", 48.0],
-].map(([supplierId, nameKa, price], i) => ({
-  id: `p-pickle-${i + 1}`,
-  supplierId: supplierId as string,
-  canonicalItemId: "can-pickle",
-  nameKa: nameKa as string,
-  baseUnit: "კგ",
-  packLabel: "ვედრო 10 კგ",
-  packQuantity: 10,
-  pricePerPack: price as number,
-  isAvailable: true,
-}));
-
-const oilProducts: SupplierProduct[] = [
-  ["sup-food", "მზესუმზირის ზეთი", 38.0],
-  ["sup-lider", "მზესუმზირის ზეთი, რაფინირებული", 40.5],
-  ["sup-natura", "მზესუმზირის ზეთი", 36.0],
-  ["sup-agro", "მზესუმზირის ზეთი", 41.0],
-].map(([supplierId, nameKa, price], i) => ({
-  id: `p-oil-${i + 1}`,
-  supplierId: supplierId as string,
-  canonicalItemId: "can-oil",
-  nameKa: nameKa as string,
-  baseUnit: "ლ",
-  packLabel: "ბიდონი 5 ლ",
-  packQuantity: 5,
-  pricePerPack: price as number,
-  isAvailable: true,
-}));
-
-const sulguniProducts: SupplierProduct[] = [
-  ["sup-natura", "სულგუნი, საღორის რძის", 34.0],
-  ["sup-bio", "სულგუნი, სოფლის", 38.0],
-  ["sup-kakhuri", "სულგუნი", 32.5],
-].map(([supplierId, nameKa, price], i) => ({
-  id: `p-sulguni-${i + 1}`,
-  supplierId: supplierId as string,
-  canonicalItemId: "can-sulguni",
-  nameKa: nameKa as string,
-  baseUnit: "კგ",
-  packLabel: "ბლოკი ~2 კგ",
-  packQuantity: 2,
-  pricePerPack: price as number,
-  isAvailable: true,
-}));
-
-export const SUPPLIER_PRODUCTS: SupplierProduct[] = [
-  ...eggProducts,
-  ...onionProducts,
-  ...potatoProducts,
-  ...pickleProducts,
-  ...oilProducts,
-  ...sulguniProducts,
-];
+export const SUPPLIER_PRODUCTS: SupplierProduct[] = built;
 
 export const productById = (id: string) =>
   SUPPLIER_PRODUCTS.find((p) => p.id === id);
+
+/** First product for a canonical slug, optionally from a specific supplier. */
+function pickProduct(slug: string, supplierId?: string): SupplierProduct {
+  const pool = SUPPLIER_PRODUCTS.filter(
+    (p) => p.canonicalItemId === `can-${slug}`,
+  );
+  return (supplierId && pool.find((p) => p.supplierId === supplierId)) || pool[0];
+}
 
 // ---------------------------------------------------------------------------
 // Seed orders
 // ---------------------------------------------------------------------------
 
 const line = (
-  productId: string,
+  slug: string,
   packs: number,
+  supplierId?: string,
 ): Order["items"][number] => {
-  const p = productById(productId)!;
+  const p = pickProduct(slug, supplierId);
   return {
-    productId,
+    productId: p.id,
     nameKa: p.nameKa,
     packLabel: p.packLabel,
     baseUnit: p.baseUnit,
@@ -415,6 +709,7 @@ const line = (
     pricePerPack: p.pricePerPack,
     packs,
     lineTotal: Math.round(p.pricePerPack * packs * 100) / 100,
+    imageUrl: p.imageUrl,
   };
 };
 
@@ -425,7 +720,10 @@ const sum = (items: Order["items"]) =>
 export function seedOrders(): Order[] {
   const buyerRecent: Order[] = [
     (() => {
-      const items = [line("p-potato-2", 4), line("p-onion-3", 1)];
+      const items = [
+        line("potato", 4, "sup-natura"),
+        line("apple", 2, "sup-natura"),
+      ];
       return {
         id: "o-seed-b1",
         number: "2026-0418",
@@ -451,7 +749,10 @@ export function seedOrders(): Order[] {
       };
     })(),
     (() => {
-      const items = [line("p-oil-2", 3), line("p-sulguni-1", 4)];
+      const items = [
+        line("oil-sunflower", 3, "sup-lider"),
+        line("sulguni", 4, "sup-lider"),
+      ];
       return {
         id: "o-seed-b2",
         number: "2026-0412",
@@ -481,7 +782,7 @@ export function seedOrders(): Order[] {
 
   const supplierInbox: Order[] = [
     (() => {
-      const items = [line("p-egg-1", 15)];
+      const items = [line("eggs", 15, SUPPLIER_PERSONA_ID)];
       return {
         id: "o-seed-s1",
         number: "2026-0421",
@@ -502,7 +803,10 @@ export function seedOrders(): Order[] {
       };
     })(),
     (() => {
-      const items = [line("p-egg-1", 20), line("p-onion-1", 3)];
+      const items = [
+        line("eggs", 20, SUPPLIER_PERSONA_ID),
+        line("onion", 3, SUPPLIER_PERSONA_ID),
+      ];
       return {
         id: "o-seed-s2",
         number: "2026-0417",
@@ -518,17 +822,13 @@ export function seedOrders(): Order[] {
         subtotal: sum(items),
         events: [
           { at: "1 სექ., 14:10", label: "შეკვეთა განთავსდა", status: "PLACED" },
-          {
-            at: "1 სექ., 14:44",
-            label: "დაადასტურე",
-            status: "CONFIRMED",
-          },
+          { at: "1 სექ., 14:44", label: "დაადასტურე", status: "CONFIRMED" },
         ],
         createdAt: 700,
       };
     })(),
     (() => {
-      const items = [line("p-egg-1", 12)];
+      const items = [line("eggs", 12, SUPPLIER_PERSONA_ID)];
       return {
         id: "o-seed-s3",
         number: "2026-0403",
@@ -544,11 +844,7 @@ export function seedOrders(): Order[] {
         subtotal: sum(items),
         events: [
           { at: "27 აგვ., 09:12", label: "შეკვეთა განთავსდა", status: "PLACED" },
-          {
-            at: "27 აგვ., 09:40",
-            label: "დაადასტურე",
-            status: "CONFIRMED",
-          },
+          { at: "27 აგვ., 09:40", label: "დაადასტურე", status: "CONFIRMED" },
           { at: "28 აგვ., 11:20", label: "მიწოდებულია", status: "DELIVERED" },
         ],
         createdAt: 600,
@@ -559,12 +855,14 @@ export function seedOrders(): Order[] {
   return [...buyerRecent, ...supplierInbox];
 }
 
-/** Category strip on the buyer home → the query each chip runs. */
-export const HOME_CATEGORIES: { label: string; query: string }[] = [
-  { label: "კვერცხი", query: "კვერცხი" },
-  { label: "ბოსტნეული", query: "ხახვი" },
-  { label: "ზეთი", query: "ზეთი" },
-  { label: "რძის ნაწარმი", query: "სულგუნი" },
-  { label: "მწნილი", query: "მწნილი" },
-  { label: "ხორცი", query: "ქათმის ხორცი" },
+/** Category strip on the buyer home — chip → the query it runs. */
+export const HOME_CATEGORIES: { label: string; slug: string; query: string }[] = [
+  { label: "კვერცხი", slug: "eggs", query: "კვერცხი" },
+  { label: "ბოსტნეული", slug: "veg", query: "ბოსტნეული" },
+  { label: "ხილი", slug: "fruit", query: "ხილი" },
+  { label: "რძის ნაწარმი", slug: "dairy", query: "რძის ნაწარმი" },
+  { label: "ხორცი", slug: "meat", query: "ხორცი" },
+  { label: "მწნილი", slug: "pickle", query: "მწნილი" },
+  { label: "ზეთი", slug: "oil", query: "ზეთი" },
+  { label: "საცხობი", slug: "bakery", query: "საცხობი" },
 ];

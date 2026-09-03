@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button, Stepper, gel } from "@/components/ui";
+import { Button, Stepper, Thumb, gel } from "@/components/ui";
 import { Screen, BackLink } from "@/components/screens/Screen";
 import { useDemo } from "@/lib/store/DemoContext";
 import { groupCart } from "@/lib/cart";
@@ -64,6 +64,11 @@ export default function CartPage() {
                       key={l.product.id}
                       className="flex items-start gap-3 px-3 py-3"
                     >
+                      <Thumb
+                        src={l.product.imageUrl}
+                        name={l.product.nameKa}
+                        className="mt-0.5"
+                      />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-title leading-[20px] text-ink">
                           {l.product.nameKa}

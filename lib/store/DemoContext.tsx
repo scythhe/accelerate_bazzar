@@ -67,6 +67,7 @@ function makeItem(productId: string, packs: number): OrderItem {
     pricePerPack: p.pricePerPack,
     packs,
     lineTotal: Math.round(p.pricePerPack * packs * 100) / 100,
+    imageUrl: p.imageUrl,
   };
 }
 

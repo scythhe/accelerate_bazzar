@@ -8,6 +8,7 @@ import {
   DropdownFilter,
   Stepper,
   TableRow,
+  Thumb,
   gel,
   gelPerUnit,
 } from "@/components/ui";
@@ -117,9 +118,10 @@ function SearchInner() {
             return (
               <TableRow
                 key={product.id}
+                thumb={<Thumb src={product.imageUrl} name={product.nameKa} />}
                 title={product.nameKa}
                 meta1={`${supplier.displayName} · ${product.packLabel}`}
-                meta2={`${supplier.delivery.leadLabel} ${supplier.delivery.cutoffLabel} · მინ. ${supplier.delivery.minOrderValue} ₾`}
+                meta2={`${supplier.delivery.leadLabel} ${supplier.delivery.cutoffLabel.replace("-მდე", "")} · მინ. ${supplier.delivery.minOrderValue} ₾`}
                 price={gel(product.pricePerPack)}
                 perUnit={gelPerUnit(pricePerBaseUnit, product.baseUnit)}
                 unavailable={!product.isAvailable}
@@ -129,7 +131,7 @@ function SearchInner() {
                       variant="secondary"
                       aria-label={`დამატება — ${product.nameKa}`}
                       onClick={() => addOnePack(product.id)}
-                      className="h-9 w-11 px-0 text-[18px] leading-none"
+                      className="h-9 w-9 px-0 text-[18px] leading-none"
                     >
                       +
                     </Button>
@@ -155,15 +157,16 @@ function LoadingRows() {
       {Array.from({ length: 8 }).map((_, i) => (
         <div
           key={i}
-          className="flex items-center gap-3 border-b border-line px-4 py-row-y last:border-b-0"
+          className="flex min-h-[84px] items-center border-b border-line px-4 py-row-y last:border-b-0"
         >
+          <div className="mr-3 h-11 w-11 shrink-0 rounded bg-surface-hover" />
           <div className="min-w-0 flex-1 space-y-1.5">
             <div className="h-3.5 w-2/5 rounded-sm bg-surface-hover" />
             <div className="h-3 w-3/5 rounded-sm bg-surface-hover" />
             <div className="h-2.5 w-2/5 rounded-sm bg-surface-hover" />
           </div>
-          <div className="h-4 w-14 rounded-sm bg-surface-hover" />
-          <div className="h-9 w-11 rounded bg-surface-hover" />
+          <div className="ml-2 h-4 w-14 rounded-sm bg-surface-hover" />
+          <div className="ml-2 h-9 w-11 rounded bg-surface-hover" />
         </div>
       ))}
     </div>

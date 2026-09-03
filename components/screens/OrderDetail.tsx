@@ -1,6 +1,6 @@
 "use client";
 
-import { StatusDot, gel } from "@/components/ui";
+import { StatusDot, Thumb, gel } from "@/components/ui";
 import type { Order, OrderStatus } from "@/lib/mock/types";
 
 const EVENT_COLOR: Record<OrderStatus, string> = {
@@ -45,6 +45,7 @@ export function OrderDetailBody({
               key={it.productId}
               className="flex items-start gap-3 px-3 py-2.5"
             >
+              <Thumb src={it.imageUrl} name={it.nameKa} className="mt-0.5" />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-strong text-ink">{it.nameKa}</p>
                 <p className="truncate text-small text-ink-2">

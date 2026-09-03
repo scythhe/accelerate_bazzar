@@ -27,24 +27,28 @@ function trigrams(s: string): Set<string> {
   return out;
 }
 
-function similarity(a: string, b: string): number {
-  if (!a || !b) return 0;
-  if (a === b) return 1;
+function scored(a: string, b: string): { dice: number; shared: number } {
+  if (!a || !b || a === b) return { dice: a === b ? 1 : 0, shared: 99 };
   const ta = trigrams(a);
   const tb = trigrams(b);
   let shared = 0;
   for (const g of ta) if (tb.has(g)) shared++;
-  return (2 * shared) / (ta.size + tb.size);
+  return { dice: (2 * shared) / (ta.size + tb.size), shared };
 }
 
-const SIM_THRESHOLD = 0.34;
+function similarity(a: string, b: string): number {
+  return scored(a, b).dice;
+}
 
+// Search terms are curated (Georgian + inflections + transliterations + ru + en),
+// so an exact or substring hit is enough. Trigram similarity is deliberately NOT
+// used for term matching — short Georgian words share prefixes too readily
+// ("ხახვი"/"ხაჭო", "მწნილი"/"მწვანილი") and it produced false results.
 function matchesTerm(query: string, term: string): boolean {
   const t = normalise(term);
   if (!t) return false;
   if (t === query) return true;
-  if (t.includes(query) || query.includes(t)) return true;
-  return similarity(query, t) >= SIM_THRESHOLD;
+  return t.length >= 4 && (t.includes(query) || query.includes(t));
 }
 
 export function searchProducts(rawQuery: string): SearchHit[] {
@@ -63,12 +67,11 @@ export function searchProducts(rawQuery: string): SearchHit[] {
     matchedCanonicalIds.has(p.canonicalItemId),
   );
 
-  // 4. fallback: direct product-name match, ranked below (only if it adds rows)
+  // 4. fallback: direct match on the supplier's own product name, ranked below
   const seen = new Set(primary.map((p) => p.id));
   const fallback = SUPPLIER_PRODUCTS.filter((p) => {
     if (seen.has(p.id)) return false;
-    const name = normalise(p.nameKa);
-    return name.includes(query) || similarity(query, name) >= SIM_THRESHOLD;
+    return normalise(p.nameKa).includes(query);
   });
 
   const toHit = (p: (typeof SUPPLIER_PRODUCTS)[number]): SearchHit => ({
@@ -94,14 +97,14 @@ export function searchProducts(rawQuery: string): SearchHit[] {
 /** Nearest categories to offer on an empty result. */
 export function suggestedCategories(rawQuery: string): string[] {
   const query = normalise(rawQuery);
-  const scored = CANONICAL_ITEMS.map((c) => ({
+  const ranked = CANONICAL_ITEMS.map((c) => ({
     label: c.categoryLabel,
     score: Math.max(
       ...c.searchTerms.map((t) => similarity(query, normalise(t))),
       0,
     ),
   }));
-  const labels = scored
+  const labels = ranked
     .sort((a, b) => b.score - a.score)
     .map((s) => s.label);
   return [...new Set(labels)].slice(0, 3);

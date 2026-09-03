@@ -54,6 +54,7 @@ export interface SupplierProduct {
   packQuantity: number; // base units per pack
   pricePerPack: number; // GEL, gross
   isAvailable: boolean;
+  imageUrl?: string; // /products/{slug}.jpg — optional; UI falls back to a letter tile
 }
 
 /** A product joined to its supplier — the shape the search screen renders. */
@@ -79,6 +80,7 @@ export interface OrderItem {
   pricePerPack: number;
   packs: number;
   lineTotal: number;
+  imageUrl?: string;
 }
 
 export interface OrderEvent {

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui";
 import { Screen } from "./Screen";
 import { OrderListRow } from "./OrderListRow";
+import { CategoryIcon, SearchIcon } from "./CategoryIcon";
 import { useDemo } from "@/lib/store/DemoContext";
 import { BUYER, HOME_CATEGORIES } from "@/lib/mock/data";
 
@@ -41,6 +42,7 @@ export function BuyerHome() {
       >
         <Input
           aria-label="ძებნა"
+          leading={<SearchIcon />}
           placeholder="ძებნა — მაგ. კვერცხი, ხახვი, ზეთი"
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -57,8 +59,9 @@ export function BuyerHome() {
             key={c.label}
             type="button"
             onClick={() => go(c.query)}
-            className="inline-flex h-8 shrink-0 items-center rounded border border-line-strong bg-paper px-3 text-small text-ink-2 transition-colors hover:bg-surface-hover"
+            className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded border border-line-strong bg-paper pl-2.5 pr-3 text-small text-ink-2 transition-colors hover:bg-surface-hover"
           >
+            <CategoryIcon slug={c.slug} className="text-ink-3" />
             {c.label}
           </button>
         ))}
