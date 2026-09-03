@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Sans_Georgian } from "next/font/google";
 import "./globals.css";
+import { Providers } from "./providers";
 
 /**
  * Noto Sans Georgian (variable), with a real Georgian subset drawn for the
@@ -31,7 +32,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ka" className={notoSansGeorgian.variable}>
-      <body className="min-h-dvh bg-paper text-ink">{children}</body>
+      <body className="min-h-dvh bg-paper text-ink">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
