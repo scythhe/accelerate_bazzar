@@ -874,10 +874,9 @@ export const HOME_CATEGORIES: { label: string; slug: string; query: string }[] =
 // ---------------------------------------------------------------------------
 
 export const SUPPLIER_PLAN = {
-  name: "სტანდარტული",
+  name: "საწყისი",
   monthlyPriceGel: 83,
   trialDays: 90,
   trialDaysLeft: 47,
   trialStartedLabel: "2 ივნისი",
-  repSpendComparisonGel: 15000, // typical monthly field-rep spend it replaces
 };

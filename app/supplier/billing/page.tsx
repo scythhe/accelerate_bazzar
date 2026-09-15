@@ -73,7 +73,12 @@ export default function SupplierBillingPage() {
 
       {/* Plan */}
       <section className="mt-4 rounded border border-line-strong px-4 py-4 shadow-card">
-        <p className="text-strong text-ink">{SUPPLIER_PLAN.name} გეგმა</p>
+        <div className="flex items-center gap-2">
+          <p className="text-strong text-ink">{SUPPLIER_PLAN.name} გეგმა</p>
+          <span className="rounded-sm border border-line-strong px-1.5 py-px text-micro text-ink-3">
+            საწყისი დონე
+          </span>
+        </div>
         <p className="tabular mt-1 text-stat text-ink">
           {gel(SUPPLIER_PLAN.monthlyPriceGel)}
           <span className="text-small font-normal text-ink-2"> /თვეში</span>
@@ -99,26 +104,6 @@ export default function SupplierBillingPage() {
             </li>
           ))}
         </ul>
-      </section>
-
-      {/* What it replaces */}
-      <section className="mt-4 rounded border border-line px-4 py-4">
-        <p className="text-micro text-ink-3">რას ხარჯავთ დღეს</p>
-        <div className="mt-2.5 grid grid-cols-2 gap-3">
-          <div>
-            <p className="text-small text-ink-2">სავაჭრო წარმომადგენლები</p>
-            <p className="tabular mt-1 text-strong text-ink-2">
-              ~15 000 ₾<span className="text-micro text-ink-3"> /თვეში</span>
-            </p>
-          </div>
-          <div>
-            <p className="text-small text-ink-2">Accelerate</p>
-            <p className="tabular mt-1 text-strong text-ink">
-              {gel(SUPPLIER_PLAN.monthlyPriceGel)}
-              <span className="text-micro text-ink-3"> /თვეში</span>
-            </p>
-          </div>
-        </div>
       </section>
 
       {/* This month */}
