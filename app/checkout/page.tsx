@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Avatar, Button, Input, Select, gel } from "@/components/ui";
 import { Screen, BackLink } from "@/components/screens/Screen";
+import { CalendarIcon, PinIcon } from "@/components/screens/Glyphs";
 import { useDemo } from "@/lib/store/DemoContext";
 import { groupCart } from "@/lib/cart";
 import { BUYER_ADDRESS } from "@/lib/mock/data";
@@ -21,9 +22,12 @@ const DATES = [
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { persona, cart, cartTotal, placeOrders } = useDemo();
+  const { persona, cart, cartTotal, placeOrders, customProducts } = useDemo();
 
-  const groups = useMemo(() => groupCart(cart), [cart]);
+  const groups = useMemo(
+    () => groupCart(cart, customProducts),
+    [cart, customProducts],
+  );
   const placing = useRef(false);
 
   useEffect(() => {
@@ -83,19 +87,31 @@ export default function CheckoutPage() {
       </section>
 
       <div className="mt-6 space-y-5">
-        <Select
-          label="მიწოდების მისამართი"
-          options={ADDRESSES}
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-        />
-        <Select
-          label="სასურველი მიწოდების თარიღი"
-          options={DATES}
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          hint="თითოეული მომწოდებელი ადასტურებს დროს ცალკე."
-        />
+        <div>
+          <div className="mb-1.5 flex items-center gap-1.5 text-micro text-ink-3">
+            <PinIcon />
+            <span>მიწოდება</span>
+          </div>
+          <Select
+            label="მისამართი"
+            options={ADDRESSES}
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+          />
+        </div>
+        <div>
+          <div className="mb-1.5 flex items-center gap-1.5 text-micro text-ink-3">
+            <CalendarIcon />
+            <span>თარიღი</span>
+          </div>
+          <Select
+            label="სასურველი მიწოდების თარიღი"
+            options={DATES}
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            hint="თითოეული მომწოდებელი ადასტურებს დროს ცალკე."
+          />
+        </div>
         <Input
           label="კომენტარი (არასავალდებულო)"
           placeholder="მაგ. მოიტანეთ უკანა შესასვლელთან"

@@ -19,12 +19,18 @@ export interface CartGroup {
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
-/** Group cart lines by supplier and evaluate each group against its minimum. */
-export function groupCart(cart: CartLine[]): CartGroup[] {
+/** Group cart lines by supplier and evaluate each group against its minimum.
+ *  `extraProducts` covers products added live in this session (a supplier's
+ *  own new-product form) that never made it into the static seed data. */
+export function groupCart(
+  cart: CartLine[],
+  extraProducts: SupplierProduct[] = [],
+): CartGroup[] {
   const bySupplier = new Map<string, CartGroupLine[]>();
 
   for (const l of cart) {
-    const product = productById(l.productId);
+    const product =
+      extraProducts.find((p) => p.id === l.productId) ?? productById(l.productId);
     if (!product || l.packs <= 0) continue;
     const arr = bySupplier.get(product.supplierId) ?? [];
     arr.push({

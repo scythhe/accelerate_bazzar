@@ -4,8 +4,29 @@ import Link from "next/link";
 import { StatusDot, gel, cn } from "@/components/ui";
 import { Screen } from "./Screen";
 import { SupplierNav } from "./SupplierNav";
+import { BellIcon, CoinIcon, ReceiptIcon } from "./Glyphs";
 import { useDemo } from "@/lib/store/DemoContext";
 import { SUPPLIER_PERSONA_ID, supplierById } from "@/lib/mock/data";
+
+function IconBadge({
+  hue,
+  children,
+}: {
+  hue: number;
+  children: React.ReactNode;
+}) {
+  return (
+    <span
+      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+      style={{
+        backgroundColor: `hsl(${hue} 55% 93%)`,
+        color: `hsl(${hue} 45% 36%)`,
+      }}
+    >
+      {children}
+    </span>
+  );
+}
 
 // Supplier inbox — incoming orders, newest first, unconfirmed ones visually
 // distinct (DEMO_PROMPT.md §7).
@@ -31,18 +52,33 @@ export function SupplierInbox() {
       <SupplierNav />
 
       {/* KPI strip — a quick read on why the subscription is worth it. */}
-      <div className="mt-4 rounded border border-line bg-paper px-4 py-3 shadow-card">
-        <p className="text-micro text-ink-3">ამ თვის ბრუნვა</p>
-        <p className="tabular mt-1 text-stat text-ink">{gel(monthTotal)}</p>
+      <div className="mt-4 flex items-center gap-3 rounded border border-line bg-paper px-4 py-3 shadow-card">
+        <IconBadge hue={142}>
+          <CoinIcon />
+        </IconBadge>
+        <div>
+          <p className="text-micro text-ink-3">ამ თვის ბრუნვა</p>
+          <p className="tabular mt-0.5 text-stat text-ink">{gel(monthTotal)}</p>
+        </div>
       </div>
       <div className="mt-2.5 grid grid-cols-2 gap-2.5">
-        <div className="rounded border border-line bg-paper px-3 py-2.5 shadow-card">
-          <p className="text-micro text-ink-3">ახალი</p>
-          <p className="tabular mt-0.5 text-h2 text-ink">{newCount}</p>
+        <div className="flex items-center gap-2.5 rounded border border-line bg-paper px-3 py-2.5 shadow-card">
+          <IconBadge hue={32}>
+            <BellIcon />
+          </IconBadge>
+          <div>
+            <p className="text-micro text-ink-3">ახალი</p>
+            <p className="tabular mt-0.5 text-h2 text-ink">{newCount}</p>
+          </div>
         </div>
-        <div className="rounded border border-line bg-paper px-3 py-2.5 shadow-card">
-          <p className="text-micro text-ink-3">შეკვეთა</p>
-          <p className="tabular mt-0.5 text-h2 text-ink">{live.length}</p>
+        <div className="flex items-center gap-2.5 rounded border border-line bg-paper px-3 py-2.5 shadow-card">
+          <IconBadge hue={216}>
+            <ReceiptIcon />
+          </IconBadge>
+          <div>
+            <p className="text-micro text-ink-3">შეკვეთა</p>
+            <p className="tabular mt-0.5 text-h2 text-ink">{live.length}</p>
+          </div>
         </div>
       </div>
 

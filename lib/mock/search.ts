@@ -4,7 +4,7 @@ import {
   canonicalById,
   supplierById,
 } from "./data";
-import type { SearchHit } from "./types";
+import type { SearchHit, SupplierProduct } from "./types";
 
 // Search pipeline (UI_BUILD_PROMPT.md §5, adapted): normalise → match canonical
 // items by search_terms → map to supplier products → fall back to product-name
@@ -51,9 +51,20 @@ function matchesTerm(query: string, term: string): boolean {
   return t.length >= 4 && (t.includes(query) || query.includes(t));
 }
 
-export function searchProducts(rawQuery: string): SearchHit[] {
+export function searchProducts(
+  rawQuery: string,
+  // Products added live this session (a supplier's own "add product" form)
+  // on top of the seed catalogue — unmapped (canonicalItemId "") until an
+  // admin would map them, so they surface via the name fallback only, same
+  // as a real freshly-added product (V1_BUILD_PROMPT.md §3).
+  extraProducts: SupplierProduct[] = [],
+): SearchHit[] {
   const query = normalise(rawQuery);
   if (!query) return [];
+
+  const pool = extraProducts.length
+    ? [...SUPPLIER_PRODUCTS, ...extraProducts]
+    : SUPPLIER_PRODUCTS;
 
   // 1–2. canonical items whose search_terms match
   const matchedCanonicalIds = new Set(
@@ -63,18 +74,16 @@ export function searchProducts(rawQuery: string): SearchHit[] {
   );
 
   // 3. supplier products for those canonical items
-  const primary = SUPPLIER_PRODUCTS.filter((p) =>
-    matchedCanonicalIds.has(p.canonicalItemId),
-  );
+  const primary = pool.filter((p) => matchedCanonicalIds.has(p.canonicalItemId));
 
   // 4. fallback: direct match on the supplier's own product name, ranked below
   const seen = new Set(primary.map((p) => p.id));
-  const fallback = SUPPLIER_PRODUCTS.filter((p) => {
+  const fallback = pool.filter((p) => {
     if (seen.has(p.id)) return false;
     return normalise(p.nameKa).includes(query);
   });
 
-  const toHit = (p: (typeof SUPPLIER_PRODUCTS)[number]): SearchHit => ({
+  const toHit = (p: (typeof pool)[number]): SearchHit => ({
     product: p,
     supplier: supplierById(p.supplierId),
     pricePerBaseUnit:

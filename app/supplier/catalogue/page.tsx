@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Switch, Thumb, gel, gelPerUnit } from "@/components/ui";
 import { Screen } from "@/components/screens/Screen";
@@ -8,17 +9,22 @@ import { SupplierNav } from "@/components/screens/SupplierNav";
 import { useDemo } from "@/lib/store/DemoContext";
 import { SUPPLIER_PERSONA_ID, SUPPLIER_PRODUCTS, supplierById } from "@/lib/mock/data";
 
-// Read-only-ish catalogue management: the one lever a supplier actually
-// touches in this demo is availability, wired live into buyer search
-// (DEMO_PROMPT scope stops short of full product forms/CSV import).
+// Catalogue management: availability toggle (live in buyer search) plus
+// adding a new product — the thing CLAUDE.md §4 says has to be trivial or a
+// supplier just won't do it.
 export default function SupplierCataloguePage() {
   const router = useRouter();
-  const { persona, isAvailable, setAvailability } = useDemo();
+  const { persona, isAvailable, setAvailability, customProducts } = useDemo();
   const supplier = supplierById(SUPPLIER_PERSONA_ID);
 
   useEffect(() => {
     if (persona !== "supplier") router.replace("/");
   }, [persona, router]);
+
+  const ownCustom = useMemo(
+    () => customProducts.filter((p) => p.supplierId === SUPPLIER_PERSONA_ID),
+    [customProducts],
+  );
 
   const products = useMemo(
     () =>
@@ -30,7 +36,9 @@ export default function SupplierCataloguePage() {
 
   if (persona !== "supplier") return null;
 
-  const availableCount = products.filter((p) => isAvailable(p)).length;
+  const all = [...ownCustom, ...products];
+  const availableCount = all.filter((p) => isAvailable(p)).length;
+  const newIds = new Set(ownCustom.map((p) => p.id));
 
   return (
     <Screen>
@@ -39,11 +47,27 @@ export default function SupplierCataloguePage() {
 
       <SupplierNav />
 
-      <div className="mt-5 flex items-baseline justify-between">
-        <h1 className="text-h3 text-ink">კატალოგი</h1>
-        <span className="tabular text-small text-ink-3">
-          {availableCount}/{products.length} ხელმისაწვდომი
-        </span>
+      <div className="mt-5 flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-h3 text-ink">კატალოგი</h1>
+          <span className="tabular text-small text-ink-3">
+            {availableCount}/{all.length} ხელმისაწვდომი
+          </span>
+        </div>
+        <Link
+          href="/supplier/catalogue/new"
+          className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded bg-ink px-3 text-strong text-white"
+        >
+          <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden>
+            <path
+              d="M8 3v10M3 8h10"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+            />
+          </svg>
+          პროდუქტი
+        </Link>
       </div>
       <p className="mt-1 text-small text-ink-2">
         გამორთეთ ის, რაც ამჟამად მარაგში არ გაქვთ — მყისვე ქრება ძებნის
@@ -51,11 +75,12 @@ export default function SupplierCataloguePage() {
       </p>
 
       <div className="mt-3 border-y border-line">
-        {products.map((product) => {
+        {all.map((product) => {
           const available = isAvailable(product);
           const pricePerBaseUnit =
             Math.round((product.pricePerPack / product.packQuantity) * 100) /
             100;
+          const isNew = newIds.has(product.id);
           return (
             <div
               key={product.id}
@@ -63,14 +88,21 @@ export default function SupplierCataloguePage() {
             >
               <Thumb src={product.imageUrl} name={product.nameKa} />
               <div className="min-w-0 flex-1">
-                <p
-                  className={
-                    "truncate text-title leading-[20px] " +
-                    (available ? "text-ink" : "text-ink-3")
-                  }
-                >
-                  {product.nameKa}
-                </p>
+                <div className="flex items-center gap-1.5">
+                  <p
+                    className={
+                      "truncate text-title leading-[20px] " +
+                      (available ? "text-ink" : "text-ink-3")
+                    }
+                  >
+                    {product.nameKa}
+                  </p>
+                  {isNew && (
+                    <span className="shrink-0 rounded-sm bg-accent px-1.5 py-px text-micro text-white">
+                      ახალი
+                    </span>
+                  )}
+                </div>
                 <p className="truncate text-small text-ink-2">
                   {product.packLabel}
                 </p>

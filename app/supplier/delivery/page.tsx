@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Screen } from "@/components/screens/Screen";
 import { SupplierNav } from "@/components/screens/SupplierNav";
+import { ClockIcon, CoinIcon, PinIcon, TruckIcon } from "@/components/screens/Glyphs";
 import { useDemo } from "@/lib/store/DemoContext";
 import { SUPPLIER_PERSONA_ID, supplierById } from "@/lib/mock/data";
 import type { District } from "@/lib/mock/types";
@@ -44,7 +45,10 @@ export default function SupplierDeliveryPage() {
       </p>
 
       <section className="mt-4 rounded border border-line px-4 py-4">
-        <p className="text-micro text-ink-3">რაიონები</p>
+        <div className="flex items-center gap-1.5 text-micro text-ink-3">
+          <PinIcon />
+          <span>რაიონები</span>
+        </div>
         <div className="mt-2 flex flex-wrap gap-1.5">
           {ALL_DISTRICTS.map((d) => {
             const active = served.has(d);
@@ -67,22 +71,33 @@ export default function SupplierDeliveryPage() {
 
       <div className="mt-4 grid grid-cols-2 gap-2.5">
         <section className="rounded border border-line px-4 py-3.5 shadow-card">
-          <p className="text-micro text-ink-3">მინიმალური შეკვეთა</p>
+          <div className="flex items-center gap-1.5 text-micro text-ink-3">
+            <CoinIcon />
+            <span>მინიმალური შეკვეთა</span>
+          </div>
           <p className="tabular mt-1 text-h3 text-ink">
             {supplier.delivery.minOrderValue} ₾
           </p>
         </section>
         <section className="rounded border border-line px-4 py-3.5 shadow-card">
-          <p className="text-micro text-ink-3">მიღების ბოლო დრო</p>
+          <div className="flex items-center gap-1.5 text-micro text-ink-3">
+            <ClockIcon />
+            <span>მიღების ბოლო დრო</span>
+          </div>
           <p className="mt-1 text-h3 text-ink">{supplier.delivery.cutoffLabel}</p>
         </section>
       </div>
 
-      <section className="mt-2.5 rounded border border-line px-4 py-3.5">
-        <p className="text-micro text-ink-3">მიწოდების ვადა</p>
-        <p className="mt-1 text-strong text-ink">
-          შეკვეთა მიღების დროზე ადრე → {supplier.delivery.leadLabel} მიწოდება
-        </p>
+      <section className="mt-2.5 flex items-center gap-3 rounded border border-line px-4 py-3.5">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface text-ink-2">
+          <TruckIcon />
+        </span>
+        <div>
+          <p className="text-micro text-ink-3">მიწოდების ვადა</p>
+          <p className="mt-0.5 text-strong text-ink">
+            შეკვეთა მიღების დროზე ადრე → {supplier.delivery.leadLabel} მიწოდება
+          </p>
+        </div>
       </section>
     </Screen>
   );

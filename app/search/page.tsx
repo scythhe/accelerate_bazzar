@@ -29,7 +29,8 @@ function SearchInner() {
   const params = useSearchParams();
   const query = params.get("q") ?? "";
 
-  const { persona, getPacks, addOnePack, setPacks, isAvailable } = useDemo();
+  const { persona, getPacks, addOnePack, setPacks, isAvailable, customProducts } =
+    useDemo();
   const [res, setRes] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -45,7 +46,7 @@ function SearchInner() {
   useEffect(() => {
     let alive = true;
     setLoading(true);
-    apiSearch(query).then((r) => {
+    apiSearch(query, customProducts).then((r) => {
       if (alive) {
         setRes(r);
         setLoading(false);
@@ -54,6 +55,10 @@ function SearchInner() {
     return () => {
       alive = false;
     };
+    // customProducts intentionally excluded — a product added mid-search
+    // shouldn't re-run the search out from under the buyer; re-search on the
+    // next query change picks it up.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
   const cheapestId = useMemo(() => {

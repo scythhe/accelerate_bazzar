@@ -21,7 +21,14 @@ import { SUPPLIER_PRODUCTS, supplierById } from "@/lib/mock/data";
 export default function SupplierStorefrontPage() {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
-  const { persona, getPacks, addOnePack, setPacks, isAvailable } = useDemo();
+  const {
+    persona,
+    getPacks,
+    addOnePack,
+    setPacks,
+    isAvailable,
+    customProducts,
+  } = useDemo();
 
   useEffect(() => {
     if (persona !== "buyer") router.replace("/");
@@ -30,10 +37,10 @@ export default function SupplierStorefrontPage() {
   const supplier = supplierById(id);
   const products = useMemo(
     () =>
-      SUPPLIER_PRODUCTS.filter((p) => p.supplierId === id).sort((a, b) =>
-        a.nameKa.localeCompare(b.nameKa, "ka"),
-      ),
-    [id],
+      [...SUPPLIER_PRODUCTS, ...customProducts]
+        .filter((p) => p.supplierId === id)
+        .sort((a, b) => a.nameKa.localeCompare(b.nameKa, "ka")),
+    [id, customProducts],
   );
 
   if (persona !== "buyer") return null;

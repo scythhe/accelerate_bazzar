@@ -29,7 +29,18 @@ interface DemoState {
   orders: Order[];
   lastPlacedIds: string[];
   availabilityOverrides: Record<string, boolean>;
+  /** Products added live via a supplier's "add product" form this session —
+   *  the seed catalogue in lib/mock/data.ts never changes. */
+  customProducts: SupplierProduct[];
   toast: { id: number; message: string } | null;
+}
+
+export interface NewProductInput {
+  nameKa: string;
+  baseUnit: SupplierProduct["baseUnit"];
+  packLabel: string;
+  packQuantity: number;
+  pricePerPack: number;
 }
 
 interface DemoContextValue extends DemoState {
@@ -55,6 +66,11 @@ interface DemoContextValue extends DemoState {
   isAvailable: (product: SupplierProduct) => boolean;
   setAvailability: (productId: string, available: boolean) => void;
 
+  /** Any product by id — seed catalogue or added this session. */
+  getProduct: (productId: string) => SupplierProduct | undefined;
+  /** Adds a product to the supplier persona's catalogue, returns its id. */
+  addProduct: (input: NewProductInput) => string;
+
   dismissToast: () => void;
 
   resetDemo: () => void;
@@ -69,10 +85,9 @@ function nowLabel(): string {
   return `დღეს, ${hh}:${mm}`;
 }
 
-function makeItem(productId: string, packs: number): OrderItem {
-  const p = productById(productId)!;
+function makeItem(p: SupplierProduct, packs: number): OrderItem {
   return {
-    productId,
+    productId: p.id,
     nameKa: p.nameKa,
     packLabel: p.packLabel,
     baseUnit: p.baseUnit,
@@ -92,13 +107,21 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   const [orders, setOrders] = useState<Order[]>(() => seedOrders());
   const [lastPlacedIds, setLastPlacedIds] = useState<string[]>([]);
   const [orderSeq, setOrderSeq] = useState(431); // next human order number
+  const [productSeq, setProductSeq] = useState(1);
   const [availabilityOverrides, setAvailabilityOverrides] = useState<
     Record<string, boolean>
   >({});
+  const [customProducts, setCustomProducts] = useState<SupplierProduct[]>([]);
   const [toast, setToast] = useState<{ id: number; message: string } | null>(
     null,
   );
   const dismissToast = useCallback(() => setToast(null), []);
+
+  const getProduct = useCallback(
+    (productId: string) =>
+      customProducts.find((p) => p.id === productId) ?? productById(productId),
+    [customProducts],
+  );
 
   const isAvailable = useCallback(
     (product: SupplierProduct) =>
@@ -109,6 +132,32 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   const setAvailability = useCallback((productId: string, available: boolean) => {
     setAvailabilityOverrides((prev) => ({ ...prev, [productId]: available }));
   }, []);
+
+  const addProduct = useCallback(
+    (input: NewProductInput) => {
+      const id = `p-custom-${productSeq}`;
+      setProductSeq((s) => s + 1);
+      setCustomProducts((prev) => [
+        ...prev,
+        {
+          id,
+          supplierId: "sup-agro",
+          // Unmapped, exactly like a real newly-added product — it's
+          // findable by name until the canonical catalogue picks it up
+          // (V1_BUILD_PROMPT.md §3, admin mapping queue).
+          canonicalItemId: "",
+          nameKa: input.nameKa,
+          baseUnit: input.baseUnit,
+          packLabel: input.packLabel,
+          packQuantity: input.packQuantity,
+          pricePerPack: input.pricePerPack,
+          isAvailable: true,
+        },
+      ]);
+      return id;
+    },
+    [productSeq],
+  );
 
   const setPersona = useCallback((p: Persona) => setPersonaState(p), []);
 
@@ -135,12 +184,12 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
           );
         return [...prev, { productId, packs: 1 }];
       });
-      const product = productById(productId);
+      const product = getProduct(productId);
       if (product) {
         setToast({ id: Date.now(), message: `დაემატა — ${product.nameKa}` });
       }
     },
-    [],
+    [getProduct],
   );
 
   const removeLine = useCallback(
@@ -155,13 +204,13 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     let count = 0;
     let total = 0;
     for (const l of cart) {
-      const p = productById(l.productId);
+      const p = getProduct(l.productId);
       if (!p) continue;
       count += l.packs;
       total += p.pricePerPack * l.packs;
     }
     return { cartCount: count, cartTotal: round2(total) };
-  }, [cart]);
+  }, [cart, getProduct]);
 
   const placeOrders = useCallback(
     ({
@@ -176,7 +225,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       // group cart by supplier
       const bySupplier = new Map<string, CartLine[]>();
       for (const l of cart) {
-        const p = productById(l.productId);
+        const p = getProduct(l.productId);
         if (!p) continue;
         const arr = bySupplier.get(p.supplierId) ?? [];
         arr.push(l);
@@ -189,7 +238,12 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
 
       for (const [supplierId, lines] of bySupplier) {
         const supplier = supplierById(supplierId);
-        const items = lines.map((l) => makeItem(l.productId, l.packs));
+        const items = lines
+          .map((l) => {
+            const p = getProduct(l.productId);
+            return p ? makeItem(p, l.packs) : null;
+          })
+          .filter((i): i is OrderItem => i !== null);
         const subtotal = round2(
           items.reduce((t, i) => t + i.lineTotal, 0),
         );
@@ -222,7 +276,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       setCart([]);
       return ids;
     },
-    [cart, orderSeq],
+    [cart, orderSeq, getProduct],
   );
 
   const confirmOrder = useCallback((id: string) => {
@@ -274,6 +328,8 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     setLastPlacedIds([]);
     setOrderSeq(431);
     setAvailabilityOverrides({});
+    setCustomProducts([]);
+    setProductSeq(1);
     setToast(null);
   }, []);
 
@@ -283,6 +339,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     orders,
     lastPlacedIds,
     availabilityOverrides,
+    customProducts,
     toast,
     setPersona,
     cartCount,
@@ -297,6 +354,8 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     rejectOrder,
     isAvailable,
     setAvailability,
+    getProduct,
+    addProduct,
     dismissToast,
     resetDemo,
   };

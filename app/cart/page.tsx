@@ -5,18 +5,20 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Avatar, Button, Stepper, Thumb, gel } from "@/components/ui";
 import { Screen, BackLink } from "@/components/screens/Screen";
+import { BagIcon } from "@/components/screens/Glyphs";
 import { useDemo } from "@/lib/store/DemoContext";
 import { groupCart } from "@/lib/cart";
 
 export default function CartPage() {
   const router = useRouter();
-  const { persona, cart, setPacks, removeLine, cartTotal } = useDemo();
+  const { persona, cart, setPacks, removeLine, cartTotal, customProducts } =
+    useDemo();
 
   useEffect(() => {
     if (persona !== "buyer") router.replace("/");
   }, [persona, router]);
 
-  const groups = groupCart(cart);
+  const groups = groupCart(cart, customProducts);
   const anyShort = groups.some((g) => !g.meetsMinimum);
 
   return (
@@ -26,7 +28,10 @@ export default function CartPage() {
 
       {groups.length === 0 ? (
         <div className="mt-8 rounded border border-line px-4 py-10 text-center">
-          <p className="text-strong text-ink">კალათა ცარიელია</p>
+          <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-surface text-ink-3">
+            <BagIcon className="h-5 w-5" />
+          </span>
+          <p className="mt-3 text-strong text-ink">კალათა ცარიელია</p>
           <p className="mt-1 text-small text-ink-2">
             იპოვეთ პროდუქტი ძებნით და დაამატეთ კალათაში.
           </p>

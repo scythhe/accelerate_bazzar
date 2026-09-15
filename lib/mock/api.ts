@@ -1,6 +1,6 @@
 import { productById, supplierById } from "./data";
 import { searchProducts, suggestedCategories } from "./search";
-import type { SearchHit } from "./types";
+import type { SearchHit, SupplierProduct } from "./types";
 
 // Everything here is async and returns a Promise even though it resolves from
 // memory — a small delay makes the loading states real. When a backend arrives,
@@ -14,9 +14,12 @@ export interface SearchResponse {
   suggestions: string[];
 }
 
-export async function apiSearch(query: string): Promise<SearchResponse> {
+export async function apiSearch(
+  query: string,
+  extraProducts: SupplierProduct[] = [],
+): Promise<SearchResponse> {
   await delay();
-  const hits = searchProducts(query);
+  const hits = searchProducts(query, extraProducts);
   return {
     query,
     hits,
