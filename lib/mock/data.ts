@@ -866,3 +866,18 @@ export const HOME_CATEGORIES: { label: string; slug: string; query: string }[] =
   { label: "ზეთი", slug: "oil", query: "ზეთი" },
   { label: "საცხობი", slug: "bakery", query: "საცხობი" },
 ];
+
+// ---------------------------------------------------------------------------
+// Subscription — CLAUDE.md §5: free for buyers always; suppliers free for the
+// first months, then a flat monthly fee (not per-SKU, no commission ever),
+// invoiced manually by bank transfer. No card data, no self-serve payment.
+// ---------------------------------------------------------------------------
+
+export const SUPPLIER_PLAN = {
+  name: "სტანდარტული",
+  monthlyPriceGel: 83,
+  trialDays: 90,
+  trialDaysLeft: 47,
+  trialStartedLabel: "2 ივნისი",
+  repSpendComparisonGel: 15000, // typical monthly field-rep spend it replaces
+};

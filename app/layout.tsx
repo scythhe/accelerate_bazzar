@@ -14,9 +14,18 @@ const notoSansGeorgian = Noto_Sans_Georgian({
   variable: "--font-sans",
 });
 
+const siteUrl = process.env.URL || process.env.DEPLOY_PRIME_URL;
+
 export const metadata: Metadata = {
+  ...(siteUrl ? { metadataBase: new URL(siteUrl) } : {}),
   title: "Accelerate",
   description: "მომწოდებლები და რესტორნები — ერთ სივრცეში.",
+  openGraph: {
+    title: "Accelerate",
+    description: "მომწოდებლები და რესტორნები — ერთ სივრცეში.",
+    type: "website",
+  },
+  robots: { index: false, follow: false },
 };
 
 export const viewport: Viewport = {
