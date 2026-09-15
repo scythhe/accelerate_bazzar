@@ -14,7 +14,12 @@ import {
   seedOrders,
   supplierById,
 } from "@/lib/mock/data";
-import type { CartLine, Order, OrderItem } from "@/lib/mock/types";
+import type {
+  CartLine,
+  Order,
+  OrderItem,
+  SupplierProduct,
+} from "@/lib/mock/types";
 
 export type Persona = "buyer" | "supplier";
 
@@ -23,6 +28,7 @@ interface DemoState {
   cart: CartLine[];
   orders: Order[];
   lastPlacedIds: string[];
+  availabilityOverrides: Record<string, boolean>;
 }
 
 interface DemoContextValue extends DemoState {
@@ -43,6 +49,10 @@ interface DemoContextValue extends DemoState {
   }) => string[]; // returns created order ids
   confirmOrder: (id: string) => void;
   rejectOrder: (id: string, reason: string) => void;
+
+  /** Live availability, honouring a supplier's catalogue toggle. */
+  isAvailable: (product: SupplierProduct) => boolean;
+  setAvailability: (productId: string, available: boolean) => void;
 
   resetDemo: () => void;
 }
@@ -79,6 +89,19 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   const [orders, setOrders] = useState<Order[]>(() => seedOrders());
   const [lastPlacedIds, setLastPlacedIds] = useState<string[]>([]);
   const [orderSeq, setOrderSeq] = useState(431); // next human order number
+  const [availabilityOverrides, setAvailabilityOverrides] = useState<
+    Record<string, boolean>
+  >({});
+
+  const isAvailable = useCallback(
+    (product: SupplierProduct) =>
+      availabilityOverrides[product.id] ?? product.isAvailable,
+    [availabilityOverrides],
+  );
+
+  const setAvailability = useCallback((productId: string, available: boolean) => {
+    setAvailabilityOverrides((prev) => ({ ...prev, [productId]: available }));
+  }, []);
 
   const setPersona = useCallback((p: Persona) => setPersonaState(p), []);
 
@@ -239,6 +262,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     setOrders(seedOrders());
     setLastPlacedIds([]);
     setOrderSeq(431);
+    setAvailabilityOverrides({});
   }, []);
 
   const value: DemoContextValue = {
@@ -246,6 +270,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     cart,
     orders,
     lastPlacedIds,
+    availabilityOverrides,
     setPersona,
     cartCount,
     cartTotal,
@@ -257,6 +282,8 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     placeOrders,
     confirmOrder,
     rejectOrder,
+    isAvailable,
+    setAvailability,
     resetDemo,
   };
 

@@ -74,6 +74,9 @@ const config: Config = {
       boxShadow: {
         none: "none",
         float: "var(--shadow-float)",
+        // A hairline lift for stat/summary cards — barely there, just enough
+        // to read as "raised" next to the flat list rows around it.
+        card: "0 1px 2px rgb(15 15 16 / 0.04), 0 1px 6px rgb(15 15 16 / 0.05)",
       },
       transitionDuration: {
         DEFAULT: "120ms",

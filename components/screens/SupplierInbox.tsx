@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { StatusDot, gel, cn } from "@/components/ui";
 import { Screen } from "./Screen";
+import { SupplierNav } from "./SupplierNav";
 import { useDemo } from "@/lib/store/DemoContext";
-import { SUPPLIER_PERSONA_ID, SUPPLIER_PLAN, supplierById } from "@/lib/mock/data";
+import { SUPPLIER_PERSONA_ID, supplierById } from "@/lib/mock/data";
 
 // Supplier inbox — incoming orders, newest first, unconfirmed ones visually
 // distinct (DEMO_PROMPT.md §7).
@@ -17,24 +18,35 @@ export function SupplierInbox() {
     .sort((a, b) => b.createdAt - a.createdAt);
 
   const newCount = inbox.filter((o) => o.status === "PLACED").length;
+  const live = inbox.filter(
+    (o) => o.status !== "REJECTED" && o.status !== "CANCELLED",
+  );
+  const monthTotal = Math.round(live.reduce((t, o) => t + o.subtotal, 0) * 100) / 100;
 
   return (
     <Screen>
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-h2 tracking-tight text-ink">Accelerate</p>
-          <p className="mt-1 text-small text-ink-2">{supplier.displayName}</p>
+      <p className="text-h2 tracking-tight text-ink">Accelerate</p>
+      <p className="mt-1 text-small text-ink-2">{supplier.displayName}</p>
+
+      <SupplierNav />
+
+      {/* KPI strip — a quick read on why the subscription is worth it. */}
+      <div className="mt-4 grid grid-cols-3 gap-2.5">
+        <div className="rounded border border-line bg-paper px-3 py-2.5 shadow-card">
+          <p className="text-micro text-ink-3">ახალი</p>
+          <p className="tabular mt-0.5 text-h3 text-ink">{newCount}</p>
         </div>
-        <Link
-          href="/supplier/billing"
-          className="mt-1 inline-flex h-8 shrink-0 items-center gap-1.5 rounded border border-line-strong bg-paper px-3 text-small text-ink-2 transition-colors hover:bg-surface-hover"
-        >
-          <span className="tabular">{gel(SUPPLIER_PLAN.monthlyPriceGel)}/თვე</span>
-          <span className="text-ink-3">· გეგმა</span>
-        </Link>
+        <div className="rounded border border-line bg-paper px-3 py-2.5 shadow-card">
+          <p className="text-micro text-ink-3">შეკვეთა</p>
+          <p className="tabular mt-0.5 text-h3 text-ink">{live.length}</p>
+        </div>
+        <div className="rounded border border-line bg-paper px-3 py-2.5 shadow-card">
+          <p className="text-micro text-ink-3">ბრუნვა</p>
+          <p className="tabular mt-0.5 text-h3 text-ink">{gel(monthTotal)}</p>
+        </div>
       </div>
 
-      <div className="mt-5 flex items-baseline justify-between">
+      <div className="mt-6 flex items-baseline justify-between">
         <h1 className="text-h3 text-ink">შემოსული შეკვეთები</h1>
         {newCount > 0 && (
           <span className="tabular text-small text-warn">
@@ -54,7 +66,7 @@ export function SupplierInbox() {
               className={cn(
                 "block rounded border px-3 py-3 transition-colors",
                 isNew
-                  ? "border-accent bg-accent-soft"
+                  ? "border-accent bg-accent-soft shadow-card"
                   : "border-line hover:bg-surface-hover",
               )}
             >

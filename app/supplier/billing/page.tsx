@@ -3,7 +3,8 @@
 import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { gel } from "@/components/ui";
-import { Screen, BackLink } from "@/components/screens/Screen";
+import { Screen } from "@/components/screens/Screen";
+import { SupplierNav } from "@/components/screens/SupplierNav";
 import { useDemo } from "@/lib/store/DemoContext";
 import { SUPPLIER_PERSONA_ID, SUPPLIER_PLAN, supplierById } from "@/lib/mock/data";
 
@@ -41,9 +42,12 @@ export default function SupplierBillingPage() {
 
   return (
     <Screen>
-      <BackLink href="/" children="შემოსული" />
-      <h1 className="text-h2 text-ink">გეგმა და გადახდა</h1>
+      <p className="text-h2 tracking-tight text-ink">Accelerate</p>
       <p className="mt-1 text-small text-ink-2">{supplier.displayName}</p>
+
+      <SupplierNav />
+
+      <h1 className="mt-5 text-h3 text-ink">გეგმა და გადახდა</h1>
 
       {/* Trial status */}
       <section className="mt-5 rounded border border-line px-4 py-4">
@@ -68,7 +72,7 @@ export default function SupplierBillingPage() {
       </section>
 
       {/* Plan */}
-      <section className="mt-4 rounded border border-line-strong px-4 py-4">
+      <section className="mt-4 rounded border border-line-strong px-4 py-4 shadow-card">
         <div className="flex items-baseline justify-between">
           <p className="text-strong text-ink">{SUPPLIER_PLAN.name} გეგმა</p>
           <p className="tabular text-h3 text-ink">

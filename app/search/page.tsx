@@ -29,7 +29,7 @@ function SearchInner() {
   const params = useSearchParams();
   const query = params.get("q") ?? "";
 
-  const { persona, getPacks, addOnePack, setPacks } = useDemo();
+  const { persona, getPacks, addOnePack, setPacks, isAvailable } = useDemo();
   const [res, setRes] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -115,18 +115,30 @@ function SearchInner() {
         {!loading &&
           res?.hits.map(({ product, supplier, pricePerBaseUnit }) => {
             const packs = getPacks(product.id);
+            const available = isAvailable(product);
             return (
               <TableRow
                 key={product.id}
                 thumb={<Thumb src={product.imageUrl} name={product.nameKa} />}
                 title={product.nameKa}
-                meta1={`${supplier.displayName} · ${product.packLabel}`}
+                meta1={
+                  <>
+                    <Link
+                      href={`/suppliers/${supplier.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-ink-2 underline-offset-2 hover:text-ink hover:underline"
+                    >
+                      {supplier.displayName}
+                    </Link>{" "}
+                    · {product.packLabel}
+                  </>
+                }
                 meta2={`${supplier.delivery.leadLabel} ${supplier.delivery.cutoffLabel.replace("-მდე", "")} · მინ. ${supplier.delivery.minOrderValue} ₾`}
                 price={gel(product.pricePerPack)}
                 perUnit={gelPerUnit(pricePerBaseUnit, product.baseUnit)}
-                unavailable={!product.isAvailable}
+                unavailable={!available}
                 action={
-                  !product.isAvailable ? undefined : packs === 0 ? (
+                  !available ? undefined : packs === 0 ? (
                     <Button
                       variant="secondary"
                       aria-label={`დამატება — ${product.nameKa}`}

@@ -47,9 +47,12 @@ export default function CartPage() {
               >
                 <header className="flex items-baseline justify-between border-b border-line px-3 py-2.5">
                   <div className="min-w-0">
-                    <p className="truncate text-strong text-ink">
+                    <Link
+                      href={`/suppliers/${g.supplier.id}`}
+                      className="truncate text-strong text-ink underline-offset-2 hover:underline"
+                    >
                       {g.supplier.displayName}
-                    </p>
+                    </Link>
                     <p className="truncate text-micro text-ink-3">
                       მინ. შეკვეთა {g.minOrderValue} ₾ ·{" "}
                       {g.supplier.delivery.leadLabel}{" "}
