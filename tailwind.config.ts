@@ -24,6 +24,9 @@ const config: Config = {
       h3: ["20px", { lineHeight: "28px", fontWeight: "700" }],
       h2: ["24px", { lineHeight: "32px", fontWeight: "700" }],
       h1: ["30px", { lineHeight: "38px", fontWeight: "700" }],
+      // Hero figures only — KPI cards, plan price, grand totals. Legible
+      // across a table during a live pitch, not just in-hand.
+      stat: ["34px", { lineHeight: "38px", fontWeight: "800" }],
     },
     // Spacing rhythm — 4/8/12/16/24/32/48/64 only. These map onto Tailwind's
     // default 1/2/3/4/6/8/12/16 steps; `row-y` is the one documented exception

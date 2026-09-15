@@ -44,7 +44,7 @@ export function BuyerHome() {
 
   return (
     <Screen>
-      <p className="text-h2 tracking-tight text-ink">Accelerate</p>
+      <p className="text-h1 tracking-tight text-ink">Accelerate</p>
       <p className="mt-1 text-small text-ink-2">{BUYER.displayName}</p>
 
       <form

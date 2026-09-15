@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button, Stepper, Thumb, gel } from "@/components/ui";
+import { Avatar, Button, Stepper, Thumb, gel } from "@/components/ui";
 import { Screen, BackLink } from "@/components/screens/Screen";
 import { useDemo } from "@/lib/store/DemoContext";
 import { groupCart } from "@/lib/cart";
@@ -45,7 +45,8 @@ export default function CartPage() {
                 key={g.supplier.id}
                 className="rounded border border-line"
               >
-                <header className="flex items-baseline justify-between border-b border-line px-3 py-2.5">
+                <header className="flex items-center gap-2.5 border-b border-line px-3 py-2.5">
+                  <Avatar name={g.supplier.displayName} seed={g.supplier.id} />
                   <div className="min-w-0">
                     <Link
                       href={`/suppliers/${g.supplier.id}`}
@@ -121,11 +122,12 @@ export default function CartPage() {
 
           <div className="mt-5 flex items-baseline justify-between">
             <span className="text-strong text-ink">სულ</span>
-            <span className="tabular text-h3 text-ink">{gel(cartTotal)}</span>
+            <span className="tabular text-stat text-ink">{gel(cartTotal)}</span>
           </div>
 
           <Button
             block
+            size="lg"
             className="mt-3"
             disabled={anyShort}
             onClick={() => router.push("/checkout")}

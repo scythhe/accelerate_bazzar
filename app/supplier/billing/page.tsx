@@ -73,13 +73,11 @@ export default function SupplierBillingPage() {
 
       {/* Plan */}
       <section className="mt-4 rounded border border-line-strong px-4 py-4 shadow-card">
-        <div className="flex items-baseline justify-between">
-          <p className="text-strong text-ink">{SUPPLIER_PLAN.name} გეგმა</p>
-          <p className="tabular text-h3 text-ink">
-            {gel(SUPPLIER_PLAN.monthlyPriceGel)}
-            <span className="text-small font-normal text-ink-2"> /თვეში</span>
-          </p>
-        </div>
+        <p className="text-strong text-ink">{SUPPLIER_PLAN.name} გეგმა</p>
+        <p className="tabular mt-1 text-stat text-ink">
+          {gel(SUPPLIER_PLAN.monthlyPriceGel)}
+          <span className="text-small font-normal text-ink-2"> /თვეში</span>
+        </p>
         <ul className="mt-3 space-y-2">
           {INCLUDED.map((line) => (
             <li key={line} className="flex gap-2 text-small text-ink-2">

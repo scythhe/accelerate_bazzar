@@ -3,6 +3,7 @@
 import { useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
+  Avatar,
   Button,
   Stepper,
   TableRow,
@@ -42,8 +43,15 @@ export default function SupplierStorefrontPage() {
       <BackLink href="/" children="მთავარი" />
 
       <div className="rounded border border-line px-4 py-4">
-        <p className="text-h3 text-ink">{supplier.displayName}</p>
-        <p className="mt-0.5 text-small text-ink-2">{supplier.legalName}</p>
+        <div className="flex items-center gap-3">
+          <Avatar name={supplier.displayName} seed={supplier.id} size={44} />
+          <div className="min-w-0">
+            <p className="truncate text-h3 text-ink">{supplier.displayName}</p>
+            <p className="mt-0.5 truncate text-small text-ink-2">
+              {supplier.legalName}
+            </p>
+          </div>
+        </div>
 
         <div className="mt-3 flex flex-wrap gap-1.5">
           {supplier.delivery.districts.map((d) => (

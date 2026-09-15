@@ -25,24 +25,24 @@ export function SupplierInbox() {
 
   return (
     <Screen>
-      <p className="text-h2 tracking-tight text-ink">Accelerate</p>
+      <p className="text-h1 tracking-tight text-ink">Accelerate</p>
       <p className="mt-1 text-small text-ink-2">{supplier.displayName}</p>
 
       <SupplierNav />
 
       {/* KPI strip — a quick read on why the subscription is worth it. */}
-      <div className="mt-4 grid grid-cols-3 gap-2.5">
+      <div className="mt-4 rounded border border-line bg-paper px-4 py-3 shadow-card">
+        <p className="text-micro text-ink-3">ამ თვის ბრუნვა</p>
+        <p className="tabular mt-1 text-stat text-ink">{gel(monthTotal)}</p>
+      </div>
+      <div className="mt-2.5 grid grid-cols-2 gap-2.5">
         <div className="rounded border border-line bg-paper px-3 py-2.5 shadow-card">
           <p className="text-micro text-ink-3">ახალი</p>
-          <p className="tabular mt-0.5 text-h3 text-ink">{newCount}</p>
+          <p className="tabular mt-0.5 text-h2 text-ink">{newCount}</p>
         </div>
         <div className="rounded border border-line bg-paper px-3 py-2.5 shadow-card">
           <p className="text-micro text-ink-3">შეკვეთა</p>
-          <p className="tabular mt-0.5 text-h3 text-ink">{live.length}</p>
-        </div>
-        <div className="rounded border border-line bg-paper px-3 py-2.5 shadow-card">
-          <p className="text-micro text-ink-3">ბრუნვა</p>
-          <p className="tabular mt-0.5 text-h3 text-ink">{gel(monthTotal)}</p>
+          <p className="tabular mt-0.5 text-h2 text-ink">{live.length}</p>
         </div>
       </div>
 

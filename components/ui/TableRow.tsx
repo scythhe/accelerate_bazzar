@@ -17,6 +17,9 @@ export interface TableRowProps {
   action?: React.ReactNode;
   /** Out of stock — dims the row, shows the tag, mutes the price. */
   unavailable?: boolean;
+  /** Cheapest available result in this list — a quiet --ok accent, not a
+   *  badge that eats title width (DESIGN_SYSTEM.md's density rule). */
+  bestPrice?: boolean;
   /** Hover affordance; pair with onClick. */
   interactive?: boolean;
   onClick?: () => void;
@@ -35,6 +38,7 @@ export function TableRow({
   perUnit,
   action,
   unavailable = false,
+  bestPrice = false,
   interactive = false,
   onClick,
 }: TableRowProps) {
@@ -45,7 +49,8 @@ export function TableRow({
       onClick={onClick}
       type={onClick ? "button" : undefined}
       className={cn(
-        "flex w-full items-center border-b border-line bg-paper px-4 py-row-y text-left",
+        "flex w-full items-center border-b border-line bg-paper py-row-y text-left",
+        bestPrice ? "border-l-2 border-l-ok pl-[14px] pr-4" : "px-4",
         thumb ? "min-h-[84px] sm:min-h-[72px]" : "",
         (interactive || onClick) &&
           "transition-colors hover:bg-surface-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent",
@@ -88,10 +93,20 @@ export function TableRow({
           {price && (
             <p
               className={cn(
-                "min-w-[64px] text-right text-price leading-[20px] tabular",
+                "flex min-w-[64px] items-center justify-end gap-1 text-right text-price leading-[20px] tabular",
                 unavailable ? "text-ink-3" : "text-ink",
               )}
             >
+              {bestPrice && (
+                <svg
+                  viewBox="0 0 16 16"
+                  className="h-3 w-3 shrink-0 text-ok"
+                  fill="currentColor"
+                  aria-hidden
+                >
+                  <path d="M8 1.5l1.9 4.2 4.6.5-3.4 3.1.9 4.6L8 11.6l-4 2.3.9-4.6-3.4-3.1 4.6-.5z" />
+                </svg>
+              )}
               {price}
             </p>
           )}

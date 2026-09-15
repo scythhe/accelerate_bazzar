@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Input, Select, gel } from "@/components/ui";
+import { Avatar, Button, Input, Select, gel } from "@/components/ui";
 import { Screen, BackLink } from "@/components/screens/Screen";
 import { useDemo } from "@/lib/store/DemoContext";
 import { groupCart } from "@/lib/cart";
@@ -59,9 +59,10 @@ export default function CheckoutPage() {
           {groups.map((g) => (
             <div
               key={g.supplier.id}
-              className="flex items-center justify-between px-3 py-2.5"
+              className="flex items-center gap-2.5 px-3 py-2.5"
             >
-              <div className="min-w-0">
+              <Avatar name={g.supplier.displayName} seed={g.supplier.id} size={28} />
+              <div className="min-w-0 flex-1">
                 <p className="truncate text-strong text-ink">
                   {g.supplier.displayName}
                 </p>
@@ -77,7 +78,7 @@ export default function CheckoutPage() {
         </div>
         <footer className="flex items-baseline justify-between border-t border-line px-3 py-2.5">
           <span className="text-strong text-ink">სულ</span>
-          <span className="tabular text-h3 text-ink">{gel(cartTotal)}</span>
+          <span className="tabular text-stat text-ink">{gel(cartTotal)}</span>
         </footer>
       </section>
 
@@ -103,7 +104,13 @@ export default function CheckoutPage() {
         />
       </div>
 
-      <Button block className="mt-6" loading={submitting} onClick={submit}>
+      <Button
+        block
+        size="lg"
+        className="mt-6"
+        loading={submitting}
+        onClick={submit}
+      >
         {groups.length} შეკვეთის განთავსება
       </Button>
     </Screen>

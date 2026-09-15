@@ -11,6 +11,7 @@ export { StatusDot, type StatusDotProps, type OrderStatus } from "./StatusDot";
 export { Sheet, type SheetProps } from "./Sheet";
 export { TableRow, type TableRowProps } from "./TableRow";
 export { Thumb, type ThumbProps } from "./Thumb";
+export { Avatar, type AvatarProps } from "./Avatar";
 export { Switch, type SwitchProps } from "./Switch";
 export { gel, gelPerUnit } from "./format";
 export { cn } from "./cn";

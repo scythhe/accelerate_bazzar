@@ -29,6 +29,7 @@ interface DemoState {
   orders: Order[];
   lastPlacedIds: string[];
   availabilityOverrides: Record<string, boolean>;
+  toast: { id: number; message: string } | null;
 }
 
 interface DemoContextValue extends DemoState {
@@ -53,6 +54,8 @@ interface DemoContextValue extends DemoState {
   /** Live availability, honouring a supplier's catalogue toggle. */
   isAvailable: (product: SupplierProduct) => boolean;
   setAvailability: (productId: string, available: boolean) => void;
+
+  dismissToast: () => void;
 
   resetDemo: () => void;
 }
@@ -92,6 +95,10 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   const [availabilityOverrides, setAvailabilityOverrides] = useState<
     Record<string, boolean>
   >({});
+  const [toast, setToast] = useState<{ id: number; message: string } | null>(
+    null,
+  );
+  const dismissToast = useCallback(() => setToast(null), []);
 
   const isAvailable = useCallback(
     (product: SupplierProduct) =>
@@ -128,6 +135,10 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
           );
         return [...prev, { productId, packs: 1 }];
       });
+      const product = productById(productId);
+      if (product) {
+        setToast({ id: Date.now(), message: `დაემატა — ${product.nameKa}` });
+      }
     },
     [],
   );
@@ -263,6 +274,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     setLastPlacedIds([]);
     setOrderSeq(431);
     setAvailabilityOverrides({});
+    setToast(null);
   }, []);
 
   const value: DemoContextValue = {
@@ -271,6 +283,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     orders,
     lastPlacedIds,
     availabilityOverrides,
+    toast,
     setPersona,
     cartCount,
     cartTotal,
@@ -284,6 +297,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     rejectOrder,
     isAvailable,
     setAvailability,
+    dismissToast,
     resetDemo,
   };
 

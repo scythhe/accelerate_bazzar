@@ -1,15 +1,8 @@
 "use client";
 
 import { StatusDot, Thumb, gel } from "@/components/ui";
-import type { Order, OrderStatus } from "@/lib/mock/types";
-
-const EVENT_COLOR: Record<OrderStatus, string> = {
-  PLACED: "var(--warn)",
-  CONFIRMED: "var(--accent)",
-  DELIVERED: "var(--ok)",
-  REJECTED: "var(--danger)",
-  CANCELLED: "var(--ink-3)",
-};
+import { OrderStatusStepper } from "./OrderStatusStepper";
+import type { Order } from "@/lib/mock/types";
 
 /** Shared body for buyer and supplier order-detail screens. */
 export function OrderDetailBody({
@@ -70,23 +63,9 @@ export function OrderDetailBody({
         </p>
       )}
 
-      <section className="mt-6">
-        <h2 className="text-micro text-ink-3">მიმდინარეობა</h2>
-        <ol className="mt-2 space-y-3">
-          {order.events.map((e, i) => (
-            <li key={i} className="flex gap-3">
-              <span
-                aria-hidden
-                className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full"
-                style={{ backgroundColor: EVENT_COLOR[e.status] }}
-              />
-              <span className="min-w-0">
-                <span className="block text-small text-ink">{e.label}</span>
-                <span className="block text-micro text-ink-3">{e.at}</span>
-              </span>
-            </li>
-          ))}
-        </ol>
+      <section className="mt-6 rounded border border-line px-4 py-4">
+        <h2 className="mb-4 text-micro text-ink-3">მიმდინარეობა</h2>
+        <OrderStatusStepper order={order} />
       </section>
     </>
   );

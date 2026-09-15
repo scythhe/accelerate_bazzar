@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -55,6 +55,14 @@ function SearchInner() {
       alive = false;
     };
   }, [query]);
+
+  const cheapestId = useMemo(() => {
+    if (!res) return null;
+    const available = res.hits
+      .filter((h) => isAvailable(h.product))
+      .sort((a, b) => a.pricePerBaseUnit - b.pricePerBaseUnit);
+    return available[0]?.product.id ?? null;
+  }, [res, isAvailable]);
 
   return (
     <Screen>
@@ -137,6 +145,7 @@ function SearchInner() {
                 price={gel(product.pricePerPack)}
                 perUnit={gelPerUnit(pricePerBaseUnit, product.baseUnit)}
                 unavailable={!available}
+                bestPrice={product.id === cheapestId}
                 action={
                   !available ? undefined : packs === 0 ? (
                     <Button
