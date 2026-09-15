@@ -66,7 +66,23 @@ export function OrderDetailBody({
       <section className="mt-6 rounded border border-line px-4 py-4">
         <h2 className="mb-4 text-micro text-ink-3">მიმდინარეობა</h2>
         <OrderStatusStepper order={order} />
+        <p className="mt-4 border-t border-line pt-3 text-micro text-ink-3">
+          ყოველი ცვლილება აქ ინახება — დავის შემთხვევაში ყოველთვის გაქვთ
+          ჩანაწერი, ვინ რა შეცვალა და როდის.
+        </p>
       </section>
+
+      {/* Roadmap preview — not a working feature yet, named honestly as one. */}
+      <div className="mt-3 flex items-center gap-2.5 rounded border border-dashed border-line px-3 py-2.5 text-ink-3">
+        <svg viewBox="0 0 16 16" className="h-4 w-4 shrink-0" fill="none" aria-hidden>
+          <rect x="3.5" y="7" width="9" height="6" rx="1" stroke="currentColor" strokeWidth="1.3" />
+          <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" strokeWidth="1.3" />
+        </svg>
+        <p className="text-small">
+          მალე: ამ შეკვეთიდან ავტომატურად გენერირებული სასაქონლო ზედნადები
+          (rs.ge).
+        </p>
+      </div>
     </>
   );
 }

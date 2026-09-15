@@ -51,6 +51,10 @@ interface DemoContextValue extends DemoState {
   getPacks: (productId: string) => number;
   setPacks: (productId: string, packs: number) => void;
   addOnePack: (productId: string) => void;
+  reorderItems: (items: { productId: string; packs: number }[]) => {
+    added: number;
+    skipped: number;
+  };
   removeLine: (productId: string) => void;
   clearCart: () => void;
 
@@ -190,6 +194,44 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       }
     },
     [getProduct],
+  );
+
+  /** One-tap "order this again" — merges a past order's lines into the current
+   *  cart at today's prices/availability, skipping anything no longer sold.
+   *  This is the habit-forming move CLAUDE.md's v1.5 roadmap names as the
+   *  real switching-cost moat, pulled forward because it's cheap to build and
+   *  the value is felt immediately rather than narrated. */
+  const reorderItems = useCallback(
+    (items: { productId: string; packs: number }[]) => {
+      let added = 0;
+      let skipped = 0;
+      setCart((prev) => {
+        const next = [...prev];
+        for (const item of items) {
+          const product = getProduct(item.productId);
+          if (!product || !isAvailable(product)) {
+            skipped++;
+            continue;
+          }
+          added++;
+          const line = next.find((l) => l.productId === item.productId);
+          if (line) line.packs += item.packs;
+          else next.push({ productId: item.productId, packs: item.packs });
+        }
+        return next;
+      });
+      if (added > 0) {
+        setToast({
+          id: Date.now(),
+          message:
+            skipped > 0
+              ? `დაემატა ${added} პროდუქტი — ${skipped} აღარ არის ხელმისაწვდომი`
+              : `დაემატა ${added} პროდუქტი კალათაში`,
+        });
+      }
+      return { added, skipped };
+    },
+    [getProduct, isAvailable],
   );
 
   const removeLine = useCallback(
@@ -347,6 +389,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     getPacks,
     setPacks,
     addOnePack,
+    reorderItems,
     removeLine,
     clearCart,
     placeOrders,

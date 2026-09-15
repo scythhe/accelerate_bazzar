@@ -722,7 +722,7 @@ export function seedOrders(): Order[] {
     (() => {
       const items = [
         line("potato", 4, "sup-natura"),
-        line("apple", 2, "sup-natura"),
+        line("orange", 2, "sup-natura"),
       ];
       return {
         id: "o-seed-b1",
