@@ -118,7 +118,7 @@ function SearchInner() {
         />
       </div>
 
-      <div className="mt-3 border-y border-line">
+      <div className="mt-3 border-y border-line lg:grid lg:grid-cols-2 lg:gap-x-8 lg:border-none">
         {loading && <LoadingRows />}
 
         {!loading && res && res.hits.length === 0 && (

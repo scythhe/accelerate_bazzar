@@ -15,7 +15,7 @@ export function Screen({
   return (
     <main
       className={cn(
-        "mx-auto w-full max-w-[520px] px-4 pb-28 pt-4 sm:px-6",
+        "mx-auto w-full max-w-[520px] px-4 pb-28 pt-4 sm:px-6 lg:max-w-[900px] lg:px-10 xl:max-w-[1120px] xl:px-14",
         className,
       )}
     >

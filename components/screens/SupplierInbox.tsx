@@ -71,7 +71,7 @@ export function SupplierInbox() {
         )}
       </div>
 
-      <div className="mt-2 space-y-2">
+      <div className="mt-2 space-y-2 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
         {inbox.map((o) => {
           const isNew = o.status === "PLACED";
           const count = o.items.reduce((n, i) => n + i.packs, 0);

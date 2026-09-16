@@ -80,7 +80,7 @@ export default function SupplierCataloguePage() {
         შედეგებიდან.
       </p>
 
-      <div className="mt-3 border-y border-line">
+      <div className="mt-3 border-y border-line lg:grid lg:grid-cols-2 lg:gap-x-8 lg:border-none">
         {all.map((product) => {
           const available = isAvailable(product);
           const pricePerBaseUnit =

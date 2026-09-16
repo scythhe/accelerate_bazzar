@@ -75,7 +75,7 @@ export function BuyerHome() {
         </form>
       </section>
 
-      <div className="mt-6 grid grid-cols-4 gap-2">
+      <div className="mt-6 grid grid-cols-4 gap-2 lg:grid-cols-8 lg:gap-3">
         {HOME_CATEGORIES.map((c) => {
           const hue = CATEGORY_HUE[c.slug] ?? 0;
           return (
@@ -112,7 +112,7 @@ export function BuyerHome() {
             ყველა
           </Link>
         </div>
-        <div className="mt-2 rounded border border-line px-1 shadow-card">
+        <div className="mt-2 rounded border border-line px-1 shadow-card lg:grid lg:grid-cols-2 lg:gap-x-6 lg:px-3">
           {recent.map((o) => (
             <OrderListRow key={o.id} order={o} href={`/orders/${o.id}`} />
           ))}
