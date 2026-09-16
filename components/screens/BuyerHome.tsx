@@ -44,28 +44,36 @@ export function BuyerHome() {
 
   return (
     <Screen>
-      <p className="text-h1 tracking-tight text-ink">Accelerate</p>
-      <p className="mt-1 text-small text-ink-2">{BUYER.displayName}</p>
-
-      <form
-        className="mt-6"
-        onSubmit={(e) => {
-          e.preventDefault();
-          go(q);
+      <section
+        className="-mx-4 -mt-4 px-4 pb-7 pt-6 sm:-mx-6 sm:px-6"
+        style={{
+          background:
+            "linear-gradient(155deg, hsl(14 62% 42%), hsl(14 68% 32%))",
         }}
       >
-        <Input
-          aria-label="ძებნა"
-          leading={<SearchIcon />}
-          placeholder="ძებნა — მაგ. კვერცხი, ხახვი, ზეთი"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          enterKeyHint="search"
-        />
-        <button type="submit" className="sr-only">
-          ძებნა
-        </button>
-      </form>
+        <p className="text-h1 tracking-tight text-white">Accelerate</p>
+        <p className="mt-1 text-small text-white/75">{BUYER.displayName}</p>
+
+        <form
+          className="mt-5"
+          onSubmit={(e) => {
+            e.preventDefault();
+            go(q);
+          }}
+        >
+          <Input
+            aria-label="ძებნა"
+            leading={<SearchIcon />}
+            placeholder="ძებნა — მაგ. კვერცხი, ხახვი, ზეთი"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            enterKeyHint="search"
+          />
+          <button type="submit" className="sr-only">
+            ძებნა
+          </button>
+        </form>
+      </section>
 
       <div className="mt-6 grid grid-cols-4 gap-2">
         {HOME_CATEGORIES.map((c) => {

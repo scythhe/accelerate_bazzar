@@ -19,11 +19,12 @@
   --line: #e8e8eb; /* default borders and dividers */
   --line-strong: #d4d4d8; /* input borders, emphasised dividers */
 
-  /* --accent — Accelerate brand colour. DESIGN_SYSTEM.md leaves this as a
-     placeholder (#XXXXXX); #1A56DB is a stand-in. Change here only. */
-  --accent: #1a56db;
-  --accent-soft: rgb(26 86 219 / 0.08); /* selected chip / row background */
-  --accent-ring: rgb(26 86 219 / 0.2); /* 3px focus ring */
+  /* --accent — Accelerate brand colour: warm terracotta, the HoReCa-industry
+     tone (fits alongside food photography better than a cold blue). Change
+     here only. */
+  --accent: #d9502f;
+  --accent-soft: rgb(217 80 47 / 0.08); /* selected chip / row background */
+  --accent-ring: rgb(217 80 47 / 0.2); /* 3px focus ring */
 
   --ok: #15803d;
   --warn: #b45309;
