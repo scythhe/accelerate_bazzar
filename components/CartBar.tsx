@@ -24,7 +24,7 @@ export function CartBar() {
   return (
     <Link
       href="/cart"
-      className="fixed bottom-3 right-3 z-40 inline-flex h-11 items-center gap-3 rounded-full bg-ink pl-4 pr-3 text-white shadow-float"
+      className="fixed bottom-3 right-3 z-40 inline-flex h-11 items-center gap-3 rounded-full bg-ink pl-4 pr-3 text-white shadow-float sm:right-[calc(50%-276px)]"
     >
       <span className="text-small font-medium">
         კალათა · {cartCount}

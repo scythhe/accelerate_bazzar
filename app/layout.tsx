@@ -41,8 +41,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ka" className={notoSansGeorgian.variable}>
-      <body className="min-h-dvh bg-paper text-ink">
-        <Providers>{children}</Providers>
+      <body className="min-h-dvh bg-surface text-ink">
+        {/* Below sm: edge-to-edge, exactly as before — this is what a buyer
+           or supplier sees on their phone. sm and up (a laptop screen during
+           a pitch): the mobile column reads as a deliberate app frame instead
+           of a sliver of content lost in an otherwise-blank browser window.
+           576px = Screen's own 520px column + its sm:px-6 padding. The two
+           floating demo controls (PersonaSwitcher, CartBar) read this same
+           576px constant to stay pinned to *this* frame's corners instead of
+           the browser window's, once the two stop being the same box. */}
+        <div className="mx-auto min-h-dvh w-full bg-paper sm:my-8 sm:max-w-[576px] sm:rounded-2xl sm:border sm:border-line sm:shadow-float md:my-12">
+          <Providers>{children}</Providers>
+        </div>
       </body>
     </html>
   );

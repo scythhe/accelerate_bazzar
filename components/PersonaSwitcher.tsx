@@ -50,7 +50,7 @@ export function PersonaSwitcher() {
   return (
     <>
       {showHint && (
-        <div className="fixed bottom-14 left-3 z-40 max-w-[220px] motion-safe:animate-[hint-in_200ms_ease-out]">
+        <div className="fixed bottom-14 left-3 z-40 max-w-[220px] motion-safe:animate-[hint-in_200ms_ease-out] sm:left-[calc(50%-276px)]">
           <div className="flex items-start gap-2 rounded-lg bg-ink px-3 py-2.5 text-small text-white shadow-float">
             <span className="flex-1">
               აქედან გადაერთეთ „რესტორანი“ და „მომწოდებელი“ ხედებს შორის
@@ -88,7 +88,7 @@ export function PersonaSwitcher() {
           setShowHint(false);
         }}
         aria-label="პერსონის შეცვლა"
-        className="fixed bottom-3 left-3 z-40 inline-flex h-9 items-center gap-2 rounded-full border border-line-strong bg-paper pl-2.5 pr-3 shadow-float"
+        className="fixed bottom-3 left-3 z-40 inline-flex h-9 items-center gap-2 rounded-full border border-line-strong bg-paper pl-2.5 pr-3 shadow-float sm:left-[calc(50%-276px)]"
       >
         <span className="relative flex h-2 w-2 shrink-0">
           {showHint && (

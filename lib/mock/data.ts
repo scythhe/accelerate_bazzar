@@ -651,7 +651,6 @@ export const canonicalById = (id: string) =>
   CANONICAL_ITEMS.find((c) => c.id === id);
 
 const built: SupplierProduct[] = [];
-let _gi = 0;
 for (const s of SEEDS) {
   carriers(s).forEach((supIdx, k) => {
     const id = `p-${s.slug}-${supIdx}`;
@@ -659,8 +658,7 @@ for (const s of SEEDS) {
       s.variants && s.variants.length
         ? s.variants[k % s.variants.length]
         : s.nameKa;
-    // ~1 in 3 products carries no image_url at all → letter-tile fallback.
-    const imageUrl = _gi % 3 === 0 ? undefined : `/products/${s.slug}.jpg`;
+    const imageUrl = `/products/${s.slug}.jpg`;
     built.push({
       id,
       supplierId: SUPPLIERS[supIdx].id,
@@ -673,7 +671,6 @@ for (const s of SEEDS) {
       isAvailable: hash(`${id}:avail`) % 11 !== 0,
       imageUrl,
     });
-    _gi++;
   });
 }
 
