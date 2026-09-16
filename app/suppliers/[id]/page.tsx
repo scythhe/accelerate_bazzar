@@ -12,6 +12,7 @@ import {
   gelPerUnit,
 } from "@/components/ui";
 import { Screen, BackLink } from "@/components/screens/Screen";
+import { ClockIcon, CoinIcon, IconBadge, TruckIcon } from "@/components/screens/Glyphs";
 import { useDemo } from "@/lib/store/DemoContext";
 import { SUPPLIER_PRODUCTS, supplierById } from "@/lib/mock/data";
 
@@ -73,20 +74,35 @@ export default function SupplierStorefrontPage() {
 
         <div className="mt-3 grid grid-cols-3 gap-3 border-t border-line pt-3">
           <div>
-            <p className="text-micro text-ink-3">მინ. შეკვეთა</p>
-            <p className="tabular mt-0.5 text-strong text-ink">
+            <div className="flex items-center gap-1.5 text-micro text-ink-3">
+              <IconBadge hue={142} size={20}>
+                <CoinIcon className="h-3 w-3" />
+              </IconBadge>
+              <span>მინ. შეკვეთა</span>
+            </div>
+            <p className="tabular mt-1 text-strong text-ink">
               {supplier.delivery.minOrderValue} ₾
             </p>
           </div>
           <div>
-            <p className="text-micro text-ink-3">მიღება</p>
-            <p className="mt-0.5 text-strong text-ink">
+            <div className="flex items-center gap-1.5 text-micro text-ink-3">
+              <IconBadge hue={32} size={20}>
+                <ClockIcon className="h-3 w-3" />
+              </IconBadge>
+              <span>მიღება</span>
+            </div>
+            <p className="mt-1 text-strong text-ink">
               {supplier.delivery.cutoffLabel}
             </p>
           </div>
           <div>
-            <p className="text-micro text-ink-3">მიწოდება</p>
-            <p className="mt-0.5 text-strong text-ink">
+            <div className="flex items-center gap-1.5 text-micro text-ink-3">
+              <IconBadge hue={216} size={20}>
+                <TruckIcon className="h-3 w-3" />
+              </IconBadge>
+              <span>მიწოდება</span>
+            </div>
+            <p className="mt-1 text-strong text-ink">
               {supplier.delivery.leadLabel}
             </p>
           </div>

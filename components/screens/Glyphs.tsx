@@ -109,3 +109,30 @@ export function BuildingIcon({ className }: { className?: string }) {
     </svg>
   );
 }
+
+/** Hue-tinted circular badge for a Glyphs icon — the "dashboard" colour
+ *  system used across KPI strips, delivery settings and billing sections.
+ *  One hue per fact, kept consistent wherever that fact reappears. */
+export function IconBadge({
+  hue,
+  size = 32,
+  children,
+}: {
+  hue: number;
+  size?: number;
+  children: React.ReactNode;
+}) {
+  return (
+    <span
+      className="flex shrink-0 items-center justify-center rounded-full"
+      style={{
+        width: size,
+        height: size,
+        backgroundColor: `hsl(${hue} 55% 93%)`,
+        color: `hsl(${hue} 45% 36%)`,
+      }}
+    >
+      {children}
+    </span>
+  );
+}

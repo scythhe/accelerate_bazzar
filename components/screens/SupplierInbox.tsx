@@ -4,29 +4,9 @@ import Link from "next/link";
 import { StatusDot, gel, cn } from "@/components/ui";
 import { Screen } from "./Screen";
 import { SupplierNav } from "./SupplierNav";
-import { BellIcon, CoinIcon, ReceiptIcon } from "./Glyphs";
+import { BellIcon, CoinIcon, IconBadge, ReceiptIcon } from "./Glyphs";
 import { useDemo } from "@/lib/store/DemoContext";
 import { SUPPLIER_PERSONA_ID, supplierById } from "@/lib/mock/data";
-
-function IconBadge({
-  hue,
-  children,
-}: {
-  hue: number;
-  children: React.ReactNode;
-}) {
-  return (
-    <span
-      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
-      style={{
-        backgroundColor: `hsl(${hue} 55% 93%)`,
-        color: `hsl(${hue} 45% 36%)`,
-      }}
-    >
-      {children}
-    </span>
-  );
-}
 
 // Supplier inbox — incoming orders, newest first, unconfirmed ones visually
 // distinct (DEMO_PROMPT.md §7).

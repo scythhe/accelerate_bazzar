@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { gel } from "@/components/ui";
 import { Screen } from "@/components/screens/Screen";
 import { SupplierNav } from "@/components/screens/SupplierNav";
+import { ClockIcon, CoinIcon, IconBadge, ReceiptIcon } from "@/components/screens/Glyphs";
 import { useDemo } from "@/lib/store/DemoContext";
 import { SUPPLIER_PERSONA_ID, SUPPLIER_PLAN, supplierById } from "@/lib/mock/data";
 
@@ -51,8 +52,10 @@ export default function SupplierBillingPage() {
 
       {/* Trial status */}
       <section className="mt-5 rounded border border-line px-4 py-4">
-        <div className="flex items-center gap-2">
-          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-ok" aria-hidden />
+        <div className="flex items-center gap-2.5">
+          <IconBadge hue={32} size={28}>
+            <ClockIcon />
+          </IconBadge>
           <p className="text-strong text-ink">საცდელი პერიოდი აქტიურია</p>
         </div>
         <p className="tabular mt-1 text-small text-ink-2">
@@ -73,7 +76,10 @@ export default function SupplierBillingPage() {
 
       {/* Plan */}
       <section className="mt-4 rounded border border-line-strong px-4 py-4 shadow-card">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
+          <IconBadge hue={142} size={28}>
+            <CoinIcon />
+          </IconBadge>
           <p className="text-strong text-ink">{SUPPLIER_PLAN.name} გეგმა</p>
           <span className="rounded-sm border border-line-strong px-1.5 py-px text-micro text-ink-3">
             საწყისი დონე
@@ -108,8 +114,13 @@ export default function SupplierBillingPage() {
 
       {/* This month */}
       <section className="mt-4 rounded border border-line px-4 py-4">
-        <p className="text-micro text-ink-3">ამ თვეს Accelerate-ზე</p>
-        <div className="mt-2 flex items-baseline justify-between">
+        <div className="flex items-center gap-2.5">
+          <IconBadge hue={216} size={28}>
+            <ReceiptIcon />
+          </IconBadge>
+          <p className="text-micro text-ink-3">ამ თვეს Accelerate-ზე</p>
+        </div>
+        <div className="mt-2.5 flex items-baseline justify-between">
           <span className="text-small text-ink-2">შეკვეთა</span>
           <span className="tabular text-strong text-ink">{stats.count}</span>
         </div>

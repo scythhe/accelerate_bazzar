@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Screen } from "@/components/screens/Screen";
 import { SupplierNav } from "@/components/screens/SupplierNav";
-import { ClockIcon, CoinIcon, PinIcon, TruckIcon } from "@/components/screens/Glyphs";
+import { ClockIcon, CoinIcon, IconBadge, PinIcon, TruckIcon } from "@/components/screens/Glyphs";
 import { useDemo } from "@/lib/store/DemoContext";
 import { SUPPLIER_PERSONA_ID, supplierById } from "@/lib/mock/data";
 import type { District } from "@/lib/mock/types";
@@ -45,8 +45,10 @@ export default function SupplierDeliveryPage() {
       </p>
 
       <section className="mt-4 rounded border border-line px-4 py-4">
-        <div className="flex items-center gap-1.5 text-micro text-ink-3">
-          <PinIcon />
+        <div className="flex items-center gap-2 text-micro text-ink-3">
+          <IconBadge hue={260} size={24}>
+            <PinIcon className="h-3.5 w-3.5" />
+          </IconBadge>
           <span>რაიონები</span>
         </div>
         <div className="mt-2 flex flex-wrap gap-1.5">
@@ -71,27 +73,31 @@ export default function SupplierDeliveryPage() {
 
       <div className="mt-4 grid grid-cols-2 gap-2.5">
         <section className="rounded border border-line px-4 py-3.5 shadow-card">
-          <div className="flex items-center gap-1.5 text-micro text-ink-3">
-            <CoinIcon />
+          <div className="flex items-center gap-2 text-micro text-ink-3">
+            <IconBadge hue={142} size={24}>
+              <CoinIcon className="h-3.5 w-3.5" />
+            </IconBadge>
             <span>მინიმალური შეკვეთა</span>
           </div>
-          <p className="tabular mt-1 text-h3 text-ink">
+          <p className="tabular mt-1.5 text-h3 text-ink">
             {supplier.delivery.minOrderValue} ₾
           </p>
         </section>
         <section className="rounded border border-line px-4 py-3.5 shadow-card">
-          <div className="flex items-center gap-1.5 text-micro text-ink-3">
-            <ClockIcon />
+          <div className="flex items-center gap-2 text-micro text-ink-3">
+            <IconBadge hue={32} size={24}>
+              <ClockIcon className="h-3.5 w-3.5" />
+            </IconBadge>
             <span>მიღების ბოლო დრო</span>
           </div>
-          <p className="mt-1 text-h3 text-ink">{supplier.delivery.cutoffLabel}</p>
+          <p className="mt-1.5 text-h3 text-ink">{supplier.delivery.cutoffLabel}</p>
         </section>
       </div>
 
       <section className="mt-2.5 flex items-center gap-3 rounded border border-line px-4 py-3.5">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface text-ink-2">
+        <IconBadge hue={216} size={36}>
           <TruckIcon />
-        </span>
+        </IconBadge>
         <div>
           <p className="text-micro text-ink-3">მიწოდების ვადა</p>
           <p className="mt-0.5 text-strong text-ink">

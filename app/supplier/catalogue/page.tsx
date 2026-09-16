@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Switch, Thumb, gel, gelPerUnit } from "@/components/ui";
 import { Screen } from "@/components/screens/Screen";
 import { SupplierNav } from "@/components/screens/SupplierNav";
+import { BagIcon, IconBadge } from "@/components/screens/Glyphs";
 import { useDemo } from "@/lib/store/DemoContext";
 import { SUPPLIER_PERSONA_ID, SUPPLIER_PRODUCTS, supplierById } from "@/lib/mock/data";
 
@@ -48,11 +49,16 @@ export default function SupplierCataloguePage() {
       <SupplierNav />
 
       <div className="mt-5 flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-h3 text-ink">კატალოგი</h1>
-          <span className="tabular text-small text-ink-3">
-            {availableCount}/{all.length} ხელმისაწვდომი
-          </span>
+        <div className="flex items-center gap-2.5">
+          <IconBadge hue={142} size={32}>
+            <BagIcon />
+          </IconBadge>
+          <div>
+            <h1 className="text-h3 text-ink">კატალოგი</h1>
+            <span className="tabular text-small text-ink-3">
+              {availableCount}/{all.length} ხელმისაწვდომი
+            </span>
+          </div>
         </div>
         <Link
           href="/supplier/catalogue/new"
