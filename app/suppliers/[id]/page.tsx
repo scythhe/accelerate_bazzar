@@ -116,7 +116,7 @@ export default function SupplierStorefrontPage() {
         </span>
       </div>
 
-      <div className="mt-2 border-y border-line lg:grid lg:grid-cols-2 lg:gap-x-8 lg:border-none">
+      <div className="mt-2 border-y border-line xl:grid xl:grid-cols-2 xl:gap-x-8 xl:border-none">
         {products.map((product) => {
           const packs = getPacks(product.id);
           const available = isAvailable(product);

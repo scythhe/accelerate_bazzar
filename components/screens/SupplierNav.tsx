@@ -16,7 +16,7 @@ const TABS = [
 export function SupplierNav() {
   const pathname = usePathname();
   return (
-    <nav className="-mx-4 mt-4 flex gap-5 overflow-x-auto border-b border-line px-4 [&::-webkit-scrollbar]:hidden">
+    <nav className="-mx-4 mt-4 flex gap-5 overflow-x-auto border-b border-line px-4 [&::-webkit-scrollbar]:hidden lg:hidden">
       {TABS.map((t) => {
         const active = pathname === t.href;
         return (
