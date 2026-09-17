@@ -72,6 +72,36 @@ export function OrderDetailBody({
         </p>
       </section>
 
+      {/* The dispute-ledger promise above, made concrete: the actual entry a
+          missing-item report or a receipt confirmation leaves behind. */}
+      {(() => {
+        const issue = [...order.events]
+          .reverse()
+          .find((e) => e.label.startsWith("ხარვეზი დაფიქსირდა"));
+        const okConfirm = order.events.find((e) =>
+          e.label.includes("ყველაფერი მიღებულია"),
+        );
+        if (issue) {
+          return (
+            <div className="mt-3 rounded border border-danger/30 bg-danger/5 px-3 py-2.5">
+              <p className="text-small font-medium text-danger">
+                ⚠ {issue.label}
+              </p>
+              <p className="mt-0.5 text-micro text-ink-3">{issue.at}</p>
+            </div>
+          );
+        }
+        if (okConfirm) {
+          return (
+            <div className="mt-3 flex items-center gap-2 rounded border border-line px-3 py-2.5 text-small text-ink-2">
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-ok" aria-hidden />
+              მიღება დადასტურებულია შემკვეთის მიერ · {okConfirm.at}
+            </div>
+          );
+        }
+        return null;
+      })()}
+
       {/* Roadmap preview — not a working feature yet, named honestly as one. */}
       <div className="mt-3 flex items-center gap-2.5 rounded border border-dashed border-line px-3 py-2.5 text-ink-3">
         <svg viewBox="0 0 16 16" className="h-4 w-4 shrink-0" fill="none" aria-hidden>

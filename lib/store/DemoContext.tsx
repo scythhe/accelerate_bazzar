@@ -65,6 +65,9 @@ interface DemoContextValue extends DemoState {
   }) => string[]; // returns created order ids
   confirmOrder: (id: string) => void;
   rejectOrder: (id: string, reason: string) => void;
+  markDelivered: (id: string) => void;
+  confirmReceived: (id: string) => void;
+  reportIssue: (id: string, note: string) => void;
 
   /** Live availability, honouring a supplier's catalogue toggle. */
   isAvailable: (product: SupplierProduct) => boolean;
@@ -363,6 +366,75 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
+  /** Supplier marks a confirmed order delivered — the third real lifecycle
+   *  step CLAUDE.md's v1.5 roadmap names ("delivery confirmation with
+   *  missing-item reporting"), not just a demo label. */
+  const markDelivered = useCallback((id: string) => {
+    setOrders((prev) =>
+      prev.map((o) =>
+        o.id === id
+          ? {
+              ...o,
+              status: "DELIVERED",
+              events: [
+                ...o.events,
+                {
+                  at: nowLabel(),
+                  label: "მომწოდებელმა მონიშნა როგორც მიწოდებული",
+                  status: "DELIVERED",
+                },
+              ],
+            }
+          : o,
+      ),
+    );
+  }, []);
+
+  /** Buyer confirms a delivery matched the order — closes the loop the
+   *  dispute-ledger caption on the order screen otherwise only promises. */
+  const confirmReceived = useCallback((id: string) => {
+    setOrders((prev) =>
+      prev.map((o) =>
+        o.id === id
+          ? {
+              ...o,
+              events: [
+                ...o.events,
+                {
+                  at: nowLabel(),
+                  label: "შემკვეთმა დაადასტურა — ყველაფერი მიღებულია",
+                  status: "DELIVERED",
+                },
+              ],
+            }
+          : o,
+      ),
+    );
+  }, []);
+
+  /** Buyer flags a missing/wrong item on a delivered order. Appends to the
+   *  same append-only event log both sides read — the actual dispute record
+   *  CLAUDE.md §8 requires, not a support ticket that lives somewhere else. */
+  const reportIssue = useCallback((id: string, note: string) => {
+    setOrders((prev) =>
+      prev.map((o) =>
+        o.id === id
+          ? {
+              ...o,
+              events: [
+                ...o.events,
+                {
+                  at: nowLabel(),
+                  label: `ხარვეზი დაფიქსირდა — ${note}`,
+                  status: "DELIVERED",
+                },
+              ],
+            }
+          : o,
+      ),
+    );
+  }, []);
+
   const resetDemo = useCallback(() => {
     setPersonaState("buyer");
     setCart([]);
@@ -395,6 +467,9 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     placeOrders,
     confirmOrder,
     rejectOrder,
+    markDelivered,
+    confirmReceived,
+    reportIssue,
     isAvailable,
     setAvailability,
     getProduct,

@@ -10,7 +10,7 @@ import { useDemo } from "@/lib/store/DemoContext";
 export default function SupplierOrderDetailPage() {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
-  const { persona, orders, confirmOrder, rejectOrder } = useDemo();
+  const { persona, orders, confirmOrder, rejectOrder, markDelivered } = useDemo();
 
   useEffect(() => {
     if (persona !== "supplier") router.replace("/");
@@ -33,6 +33,11 @@ export default function SupplierOrderDetailPage() {
     router.push("/");
   };
 
+  const deliver = () => {
+    if (!order) return;
+    markDelivered(order.id);
+  };
+
   return (
     <Screen>
       <BackLink href="/" children="შემოსული" />
@@ -53,6 +58,12 @@ export default function SupplierOrderDetailPage() {
                 უარყოფა
               </Button>
             </div>
+          )}
+
+          {order.status === "CONFIRMED" && (
+            <Button block size="lg" className="mt-6" onClick={deliver}>
+              მონიშნე მიწოდებულად
+            </Button>
           )}
 
           <Sheet
