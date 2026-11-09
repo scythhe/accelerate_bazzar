@@ -23,7 +23,7 @@ export default function KitchenSinkPage() {
   return (
     <main className="mx-auto max-w-[1100px] px-4 py-8 sm:px-8">
       <header className="mb-12">
-        <p className="text-h1 tracking-tight text-ink">Accelerate</p>
+        <p className="text-h1 tracking-tight text-ink">Bazzar</p>
         <p className="mt-2 text-body text-ink-2">
           კომპონენტების ინვენტარი — ყველა პრიმიტივი, ყველა მდგომარეობაში.
         </p>

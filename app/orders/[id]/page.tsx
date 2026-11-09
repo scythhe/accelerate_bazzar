@@ -43,14 +43,14 @@ export default function BuyerOrderDetailPage() {
   };
 
   return (
-    <Screen>
+    <Screen narrow>
       <BackLink href="/orders" children="შეკვეთები" />
       {order ? (
         <>
           <OrderDetailBody order={order} />
 
           {order.status === "DELIVERED" && !responded && (
-            <section className="mt-6 rounded border border-line px-4 py-4">
+            <section className="mt-6 card px-4 py-4">
               <p className="text-strong text-ink">ყველაფერი მოვიდა?</p>
               <p className="mt-1 text-small text-ink-2">
                 დაადასტურეთ მიღება, ან მიუთითეთ, თუ რამე აკლია — ორივე

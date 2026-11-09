@@ -1,5 +1,6 @@
 "use client";
 
+import { LockSimple, Warning } from "@phosphor-icons/react";
 import { StatusDot, Thumb, gel } from "@/components/ui";
 import { OrderStatusStepper } from "./OrderStatusStepper";
 import type { Order } from "@/lib/mock/types";
@@ -14,7 +15,7 @@ export function OrderDetailBody({
 }) {
   return (
     <>
-      <div className="flex items-baseline justify-between">
+      <div className="flex items-center justify-between gap-3">
         <h1 className="text-h2 text-ink">№{order.number}</h1>
         <StatusDot status={order.status} />
       </div>
@@ -31,7 +32,7 @@ export function OrderDetailBody({
         </dl>
       )}
 
-      <section className="mt-5 rounded border border-line">
+      <section className="mt-5 card">
         <div className="divide-y divide-line">
           {order.items.map((it) => (
             <div
@@ -42,7 +43,7 @@ export function OrderDetailBody({
               <div className="min-w-0 flex-1">
                 <p className="truncate text-strong text-ink">{it.nameKa}</p>
                 <p className="truncate text-small text-ink-2">
-                  {it.packLabel} · {it.packs} × {gel(it.pricePerPack)}
+                  {it.packs} {it.baseUnit} × {gel(it.pricePerPack)}
                 </p>
               </div>
               <span className="shrink-0 tabular text-strong text-ink">
@@ -63,7 +64,7 @@ export function OrderDetailBody({
         </p>
       )}
 
-      <section className="mt-6 rounded border border-line px-4 py-4">
+      <section className="mt-6 card px-4 py-4">
         <h2 className="mb-4 text-micro text-ink-3">მიმდინარეობა</h2>
         <OrderStatusStepper order={order} />
         <p className="mt-4 border-t border-line pt-3 text-micro text-ink-3">
@@ -84,8 +85,9 @@ export function OrderDetailBody({
         if (issue) {
           return (
             <div className="mt-3 rounded border border-danger/30 bg-danger/5 px-3 py-2.5">
-              <p className="text-small font-medium text-danger">
-                ⚠ {issue.label}
+              <p className="flex items-center gap-1.5 text-small font-medium text-danger">
+                <Warning weight="fill" aria-hidden="true" className="h-4 w-4 shrink-0" />
+                {issue.label}
               </p>
               <p className="mt-0.5 text-micro text-ink-3">{issue.at}</p>
             </div>
@@ -93,7 +95,7 @@ export function OrderDetailBody({
         }
         if (okConfirm) {
           return (
-            <div className="mt-3 flex items-center gap-2 rounded border border-line px-3 py-2.5 text-small text-ink-2">
+            <div className="mt-3 flex items-center gap-2 card px-3 py-2.5 text-small text-ink-2">
               <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-ok" aria-hidden />
               მიღება დადასტურებულია შემკვეთის მიერ · {okConfirm.at}
             </div>
@@ -104,10 +106,7 @@ export function OrderDetailBody({
 
       {/* Roadmap preview — not a working feature yet, named honestly as one. */}
       <div className="mt-3 flex items-center gap-2.5 rounded border border-dashed border-line px-3 py-2.5 text-ink-3">
-        <svg viewBox="0 0 16 16" className="h-4 w-4 shrink-0" fill="none" aria-hidden>
-          <rect x="3.5" y="7" width="9" height="6" rx="1" stroke="currentColor" strokeWidth="1.3" />
-          <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" strokeWidth="1.3" />
-        </svg>
+        <LockSimple weight="duotone" aria-hidden="true" className="h-5 w-5 shrink-0" />
         <p className="text-small">
           მალე: ამ შეკვეთიდან ავტომატურად გენერირებული სასაქონლო ზედნადები
           (rs.ge).

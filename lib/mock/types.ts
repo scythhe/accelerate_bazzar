@@ -42,6 +42,7 @@ export interface CanonicalItem {
   nameKa: string;
   baseUnit: BaseUnit;
   searchTerms: string[]; // Georgian + translit + ru + en
+  imageUrl?: string;
 }
 
 export interface SupplierProduct {
@@ -53,8 +54,11 @@ export interface SupplierProduct {
   packLabel: string; // "თარო (30 ცალი)"
   packQuantity: number; // base units per pack
   pricePerPack: number; // GEL, gross
+  minQty: number; // smallest order, in base units
   isAvailable: boolean;
   imageUrl?: string; // /products/{slug}.jpg — optional; UI falls back to a letter tile
+  sku?: string; // the supplier's own product code
+  categoryLabel?: string; // set on supplier-added products; seed ones get it from the canonical item
 }
 
 /** A product joined to its supplier — the shape the search screen renders. */
@@ -104,6 +108,18 @@ export interface Order {
   items: OrderItem[];
   subtotal: number;
   events: OrderEvent[];
+  createdAt: number; // sort key
+}
+
+/** One line in the buyers' news feed: something a supplier changed. */
+export interface CatalogueNews {
+  id: string;
+  supplierId: string;
+  productId: string;
+  kind: "NEW_PRODUCT" | "PRICE_CHANGE";
+  price: number; // GEL per base unit, as of this event
+  oldPrice?: number; // PRICE_CHANGE only
+  at: string; // display label
   createdAt: number; // sort key
 }
 

@@ -1,34 +1,37 @@
 import { cn } from "./cn";
 
 export interface TableRowProps {
-  /** Optional 44px leading thumbnail (image or fallback tile). */
+  /** Optional leading thumbnail (image or fallback tile). */
   thumb?: React.ReactNode;
-  /** Primary line — product name. 17/500, --ink. */
+  /** Primary line — product name. */
   title: React.ReactNode;
-  /** Meta line 1 — supplier · pack. 13/400, --ink-2. */
+  /** Meta line 1 — the supplier. */
   meta1?: React.ReactNode;
-  /** Meta line 2 — delivery · minimum. 11/500, --ink-3. */
+  /** Meta line 2 — delivery · minimum. */
   meta2?: React.ReactNode;
-  /** Pack price the buyer pays, e.g. "12.00 ₾". 17/700, tabular, right-aligned. */
+  /** Price the buyer pays, e.g. "12.00 ₾". */
   price?: React.ReactNode;
-  /** Comparison figure, e.g. "0.40 ₾/ცალი". 13/500, --ink-3, tabular. */
+  /** What the price is for, e.g. "1 ცალი". */
   perUnit?: React.ReactNode;
-  /** Trailing control — stepper or add button. */
+  /** Trailing control — the add button. */
   action?: React.ReactNode;
+  /** Full-width line under the row — the quantity stepper once it's in the
+   *  cart, so the title and price columns keep their width. */
+  footer?: React.ReactNode;
   /** Out of stock — dims the row, shows the tag, mutes the price. */
   unavailable?: boolean;
-  /** Cheapest available result in this list — a quiet --ok accent, not a
-   *  badge that eats title width (DESIGN_SYSTEM.md's density rule). */
+  /** Cheapest available result in this list. */
   bestPrice?: boolean;
   /** Hover affordance; pair with onClick. */
   interactive?: boolean;
   onClick?: () => void;
 }
 
-// Search result row (DESIGN_SYSTEM.md §5). Vertical padding 14px, horizontal
-// 16px, 1px --line divider, no gap, no card, no radius. 84px tall on mobile with
-// the thumbnail, 12px between thumb and title. Still a dense list — the price
-// column stays right-aligned with a fixed minimum width so decimals align.
+// The product card: the core of the app, so everything else is built to match
+// it. Name and price share the top line, then supplier and delivery run the full
+// width below, because those are what a buyer in a hurry needs to read whole. The
+// name gets two lines for the same reason, and prices keep a fixed width so they
+// line up down a column.
 export function TableRow({
   thumb,
   title,
@@ -37,6 +40,7 @@ export function TableRow({
   price,
   perUnit,
   action,
+  footer,
   unavailable = false,
   bestPrice = false,
   interactive = false,
@@ -49,80 +53,75 @@ export function TableRow({
       onClick={onClick}
       type={onClick ? "button" : undefined}
       className={cn(
-        "flex w-full items-center border-b border-line bg-paper py-row-y text-left",
-        bestPrice ? "border-l-2 border-l-ok pl-[14px] pr-4" : "px-4",
-        thumb ? "min-h-[84px] sm:min-h-[72px]" : "",
+        "card grid w-full grid-cols-[auto_minmax(0,1fr)_auto_auto] items-start gap-x-2 gap-y-1 p-3 text-left transition-shadow hover:shadow-lift",
         (interactive || onClick) &&
-          "transition-colors hover:bg-surface-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent",
+          "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent",
       )}
     >
-      {thumb && (
-        <span className={cn("mr-3 shrink-0", unavailable && "opacity-55")}>
+      {thumb ? (
+        <span
+          className={cn(
+            "relative row-span-2 mr-1 self-center",
+            unavailable && "opacity-55",
+          )}
+        >
           {thumb}
-        </span>
-      )}
-
-      {/* Left column — grows, truncates. Tight line-boxes keep the row short. */}
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <div className="flex items-center gap-2">
-          <p
-            className={cn(
-              "truncate text-title leading-[20px]",
-              unavailable ? "text-ink-3" : "text-ink",
-            )}
-          >
-            {title}
-          </p>
-          {unavailable && (
-            <span className="shrink-0 rounded-sm border border-line-strong px-1.5 py-px text-micro text-ink-3">
-              ამოიწურა
+          {bestPrice && (
+            <span className="absolute inset-x-0 bottom-0 rounded-b bg-saffron py-px text-center text-[11px] font-semibold leading-4 text-ink">
+              იაფი
             </span>
           )}
-        </div>
-        {meta1 && (
-          <p className="truncate text-small leading-4 text-ink-2">{meta1}</p>
-        )}
-        {meta2 && (
-          <p className="truncate text-micro leading-[14px] text-ink-3">{meta2}</p>
+        </span>
+      ) : (
+        <span className="row-span-2" />
+      )}
+
+      <div className="min-w-0">
+        <p
+          className={cn(
+            "line-clamp-2 text-strong leading-[20px] sm:text-title sm:leading-[22px]",
+            unavailable ? "text-ink-3" : "text-ink",
+          )}
+        >
+          {title}
+        </p>
+        {unavailable && (
+          <span className="mt-1 inline-block rounded-full bg-surface-hover px-2 py-px text-micro text-ink-3">
+            ამოიწურა
+          </span>
         )}
       </div>
 
-      {/* Price block — right-aligned, tabular, fixed minimum width. */}
-      {(price || perUnit) && (
-        <div className="ml-1.5 flex shrink-0 flex-col items-end">
-          {price && (
-            <p
-              className={cn(
-                "flex min-w-[64px] items-center justify-end gap-1 text-right text-price leading-[20px] tabular",
-                unavailable ? "text-ink-3" : "text-ink",
-              )}
-            >
-              {bestPrice && (
-                <svg
-                  viewBox="0 0 16 16"
-                  className="h-3 w-3 shrink-0 text-ok"
-                  fill="currentColor"
-                  aria-hidden
-                >
-                  <path d="M8 1.5l1.9 4.2 4.6.5-3.4 3.1.9 4.6L8 11.6l-4 2.3.9-4.6-3.4-3.1 4.6-.5z" />
-                </svg>
-              )}
-              {price}
-            </p>
-          )}
-          {perUnit && (
-            <p className="text-right text-small font-medium leading-4 tabular text-ink-3">
-              {perUnit}
-            </p>
-          )}
+      <div className="flex flex-col items-end">
+        {price && (
+          <p
+            className={cn(
+              "min-w-[64px] text-right text-price leading-[22px] tabular",
+              unavailable ? "text-ink-3" : bestPrice ? "text-ok" : "text-ink",
+            )}
+          >
+            {price}
+          </p>
+        )}
+        {perUnit && (
+          <p className="text-right text-small leading-4 tabular text-ink-3">
+            {perUnit}
+          </p>
+        )}
+      </div>
+
+      <div className="flex justify-end">{action}</div>
+
+      {(meta1 || meta2) && (
+        <div className="col-start-2 col-end-5 min-w-0 space-y-0.5 text-small leading-5 text-ink-2">
+          {meta1 && <p className="truncate">{meta1}</p>}
+          {meta2 && <p className="truncate">{meta2}</p>}
         </div>
       )}
 
-      {/* Action — fixed-width cell so the price column never shifts between the
-          add button, a stepper and the sold-out state. */}
-      {(action || price) && (
-        <div className="ml-1.5 flex min-w-[36px] shrink-0 justify-end">
-          {action}
+      {footer && (
+        <div className="col-span-full mt-1.5 border-t border-line pt-2.5">
+          {footer}
         </div>
       )}
     </Wrapper>

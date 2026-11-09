@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { X } from "@phosphor-icons/react";
 import { cn } from "./cn";
 
 export interface SheetProps {
@@ -37,7 +38,10 @@ export function Sheet({
     restoreRef.current = document.activeElement as HTMLElement;
     const { overflow } = document.body.style;
     document.body.style.overflow = "hidden";
-    panelRef.current?.focus();
+    // Leave focus alone if a field inside has already claimed it with autoFocus.
+    if (!panelRef.current?.contains(document.activeElement)) {
+      panelRef.current?.focus();
+    }
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") handleClose();
@@ -85,14 +89,7 @@ export function Sheet({
             aria-label="დახურვა"
             className="-mr-2 -mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded text-ink-3 transition-colors hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent"
           >
-            <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden="true">
-              <path
-                d="m4 4 8 8M12 4l-8 8"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
+            <X weight="bold" aria-hidden="true" className="h-4 w-4" />
           </button>
         </header>
 

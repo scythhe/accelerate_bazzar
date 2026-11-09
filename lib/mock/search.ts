@@ -62,8 +62,15 @@ export function searchProducts(
   const query = normalise(rawQuery);
   if (!query) return [];
 
+  // A seed product edited this session arrives here under its own id, so the
+  // edited copy has to replace the original rather than sit beside it.
   const pool = extraProducts.length
-    ? [...SUPPLIER_PRODUCTS, ...extraProducts]
+    ? [
+        ...SUPPLIER_PRODUCTS.filter(
+          (p) => !extraProducts.some((e) => e.id === p.id),
+        ),
+        ...extraProducts,
+      ]
     : SUPPLIER_PRODUCTS;
 
   // 1–2. canonical items whose search_terms match
@@ -80,7 +87,10 @@ export function searchProducts(
   const seen = new Set(primary.map((p) => p.id));
   const fallback = pool.filter((p) => {
     if (seen.has(p.id)) return false;
-    return normalise(p.nameKa).includes(query);
+    return (
+      normalise(p.nameKa).includes(query) ||
+      normalise(p.categoryLabel ?? "") === query
+    );
   });
 
   const toHit = (p: (typeof pool)[number]): SearchHit => ({
@@ -101,6 +111,43 @@ export function searchProducts(
       });
 
   return [...rank(primary), ...rank(fallback)];
+}
+
+export interface SearchSuggestion {
+  nameKa: string;
+  imageUrl?: string;
+  supplierCount: number;
+  cheapestPerUnit: number;
+  baseUnit: SupplierProduct["baseUnit"];
+}
+
+/** Typeahead for the search box — finishes the word after a letter or two, so
+ *  nobody has to type "კვერცხი" in full with wet hands. */
+export function searchSuggestions(rawQuery: string, limit = 5): SearchSuggestion[] {
+  const query = normalise(rawQuery);
+  if (!query) return [];
+
+  return CANONICAL_ITEMS.filter(
+    (c) =>
+      normalise(c.nameKa).includes(query) ||
+      c.searchTerms.some((t) => normalise(t).startsWith(query)),
+  )
+    .map((c) => {
+      const products = SUPPLIER_PRODUCTS.filter(
+        (p) => p.canonicalItemId === c.id && p.isAvailable,
+      );
+      return {
+        nameKa: c.nameKa,
+        imageUrl: products[0]?.imageUrl,
+        supplierCount: new Set(products.map((p) => p.supplierId)).size,
+        cheapestPerUnit: Math.min(
+          ...products.map((p) => p.pricePerPack / p.packQuantity),
+        ),
+        baseUnit: c.baseUnit,
+      };
+    })
+    .filter((s) => s.supplierCount > 0)
+    .slice(0, limit);
 }
 
 /** Nearest categories to offer on an empty result. */

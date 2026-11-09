@@ -16,7 +16,7 @@ export interface ThumbProps {
   className?: string;
 }
 
-// 44px square, 6px radius. Renders the image when it loads; otherwise a
+// 64px square, 6px radius. Renders the image when it loads; otherwise a
 // --surface tile with a 1px --line border and the first Georgian letter centred
 // in --ink-3 at title size. Never a broken-image icon.
 export function Thumb({ src, name, className }: ThumbProps) {
@@ -26,7 +26,7 @@ export function Thumb({ src, name, className }: ThumbProps) {
   return (
     <span
       className={cn(
-        "block h-11 w-11 shrink-0 overflow-hidden rounded",
+        "block h-16 w-16 shrink-0 overflow-hidden rounded bg-surface",
         className,
       )}
     >
@@ -35,16 +35,16 @@ export function Thumb({ src, name, className }: ThumbProps) {
         <img
           src={src}
           alt=""
-          width={44}
-          height={44}
+          width={64}
+          height={64}
           loading="lazy"
           onError={() => setFailed(true)}
-          className="h-11 w-11 object-cover"
+          className="h-16 w-16 object-cover"
         />
       ) : (
         <span
           aria-hidden="true"
-          className="flex h-11 w-11 items-center justify-center border border-line bg-surface text-title text-ink-3"
+          className="flex h-16 w-16 items-center justify-center bg-surface text-title text-ink-3"
         >
           {firstLetter(name)}
         </span>

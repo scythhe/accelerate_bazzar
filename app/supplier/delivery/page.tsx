@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Screen } from "@/components/screens/Screen";
-import { SupplierNav } from "@/components/screens/SupplierNav";
 import { ClockIcon, CoinIcon, IconBadge, PinIcon, TruckIcon } from "@/components/screens/Glyphs";
 import { useDemo } from "@/lib/store/DemoContext";
 import { SUPPLIER_PERSONA_ID, supplierById } from "@/lib/mock/data";
@@ -33,20 +32,15 @@ export default function SupplierDeliveryPage() {
   const served = new Set(supplier.delivery.districts);
 
   return (
-    <Screen>
-      <p className="text-h2 tracking-tight text-ink">Accelerate</p>
-      <p className="mt-1 text-small text-ink-2">{supplier.displayName}</p>
-
-      <SupplierNav />
-
-      <h1 className="mt-5 text-h3 text-ink">მიწოდების პარამეტრები</h1>
+    <Screen narrow>
+      <h1 className="text-h2 text-ink">მიწოდების პარამეტრები</h1>
       <p className="mt-1 text-small text-ink-2">
-        ეს პარამეტრები ჩანს ყველა ბუყერისთვის ძებნის შედეგებში, ფასის გვერდით.
+        ეს პარამეტრები ჩანს ყველა მყიდველისთვის ძებნის შედეგებში, ფასის გვერდით.
       </p>
 
-      <section className="mt-4 rounded border border-line px-4 py-4">
+      <section className="mt-4 card px-4 py-4">
         <div className="flex items-center gap-2 text-micro text-ink-3">
-          <IconBadge hue={260} size={24}>
+          <IconBadge tone="pomegranate" size={24}>
             <PinIcon className="h-3.5 w-3.5" />
           </IconBadge>
           <span>რაიონები</span>
@@ -72,9 +66,9 @@ export default function SupplierDeliveryPage() {
       </section>
 
       <div className="mt-4 grid grid-cols-2 gap-2.5">
-        <section className="rounded border border-line px-4 py-3.5 shadow-card">
+        <section className="card px-4 py-3.5">
           <div className="flex items-center gap-2 text-micro text-ink-3">
-            <IconBadge hue={142} size={24}>
+            <IconBadge tone="herb" size={24}>
               <CoinIcon className="h-3.5 w-3.5" />
             </IconBadge>
             <span>მინიმალური შეკვეთა</span>
@@ -83,9 +77,9 @@ export default function SupplierDeliveryPage() {
             {supplier.delivery.minOrderValue} ₾
           </p>
         </section>
-        <section className="rounded border border-line px-4 py-3.5 shadow-card">
+        <section className="card px-4 py-3.5">
           <div className="flex items-center gap-2 text-micro text-ink-3">
-            <IconBadge hue={32} size={24}>
+            <IconBadge tone="saffron" size={24}>
               <ClockIcon className="h-3.5 w-3.5" />
             </IconBadge>
             <span>მიღების ბოლო დრო</span>
@@ -94,8 +88,8 @@ export default function SupplierDeliveryPage() {
         </section>
       </div>
 
-      <section className="mt-2.5 flex items-center gap-3 rounded border border-line px-4 py-3.5">
-        <IconBadge hue={216} size={36}>
+      <section className="mt-2.5 flex items-center gap-3 card px-4 py-3.5">
+        <IconBadge tone="pomegranate" size={36}>
           <TruckIcon />
         </IconBadge>
         <div>

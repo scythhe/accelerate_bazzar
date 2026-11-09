@@ -8,12 +8,12 @@ export type OrderStatus =
   | "REJECTED"
   | "CANCELLED";
 
-const STATUS: Record<OrderStatus, { label: string; color: string }> = {
-  PLACED: { label: "განთავსებულია", color: "var(--warn)" },
-  CONFIRMED: { label: "დადასტურებულია", color: "var(--accent)" },
-  DELIVERED: { label: "მიწოდებულია", color: "var(--ok)" },
-  REJECTED: { label: "უარყოფილია", color: "var(--danger)" },
-  CANCELLED: { label: "გაუქმებულია", color: "var(--ink-3)" },
+const STATUS: Record<OrderStatus, { label: string; color: string; soft: string }> = {
+  PLACED: { label: "განთავსებულია", color: "var(--warn)", soft: "var(--saffron-soft)" },
+  CONFIRMED: { label: "დადასტურებულია", color: "var(--ok)", soft: "var(--herb-soft)" },
+  DELIVERED: { label: "მიწოდებულია", color: "var(--ink-2)", soft: "var(--surface-hover)" },
+  REJECTED: { label: "უარყოფილია", color: "var(--danger)", soft: "var(--accent-soft)" },
+  CANCELLED: { label: "გაუქმებულია", color: "var(--ink-3)", soft: "var(--surface-hover)" },
 };
 
 export interface StatusDotProps {
@@ -23,21 +23,35 @@ export interface StatusDotProps {
   className?: string;
 }
 
-// 6px dot in the status colour + 6px gap + label at `small` in --ink-2.
-// Never a filled badge (DESIGN_SYSTEM.md §3, §6).
+// A soft pill in the status colour — readable at a glance on a busy list.
 export function StatusDot({ status, dotOnly = false, className }: StatusDotProps) {
   const meta = STATUS[status];
+  if (dotOnly) {
+    return (
+      <span className={cn("inline-flex", className)} title={meta.label}>
+        <span
+          aria-hidden="true"
+          className="h-2 w-2 rounded-full"
+          style={{ backgroundColor: meta.color }}
+        />
+        <span className="sr-only">{meta.label}</span>
+      </span>
+    );
+  }
   return (
     <span
-      className={cn("inline-flex items-center gap-1.5 text-small text-ink-2", className)}
-      title={dotOnly ? meta.label : undefined}
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-micro",
+        className,
+      )}
+      style={{ backgroundColor: meta.soft, color: meta.color }}
     >
       <span
         aria-hidden="true"
         className="h-1.5 w-1.5 shrink-0 rounded-full"
         style={{ backgroundColor: meta.color }}
       />
-      {dotOnly ? <span className="sr-only">{meta.label}</span> : <span>{meta.label}</span>}
+      {meta.label}
     </span>
   );
 }

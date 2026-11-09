@@ -11,20 +11,18 @@ them literally.
 
 ## 1. Where the personality lives
 
-This interface gets exactly two distinctive elements. Everything else is quiet
-infrastructure that makes those two work.
+Bazzar is a Georgian market, and the interface should feel like one: warm, tactile
+and full of real food, while the part you operate stays calm and exact.
 
-1. **The search results row** — a dense, precisely aligned price-comparison list.
-   This is not a standard SaaS pattern and it is the reason someone uses
-   Accelerate instead of calling six suppliers. It deserves obsessive attention.
-2. **The Accelerate wordmark** — bold, geometric, angular. The only loud mark
-   anywhere.
+1. **Real photography.** Category tiles, the home hero, login and the distributor
+   banner are photographs, not icons or illustration. A photo must show the actual
+   thing named on it, with no visible brands.
+2. **The product card.** A price comparison a buyer can read whole in a hurry. This
+   is the reason someone uses Bazzar instead of calling six suppliers.
+3. **The wordmark and awning mark** (`components/Logo.tsx`).
 
-Do not try to make the interface interesting through colour, gradients,
-illustration, rounded pill shapes, or decorative flourish. Distinctiveness here
-comes from **density and alignment**, not decoration. Get the type scale,
-spacing rhythm and row density exactly right and it will look expensive. Add
-ornament and it will look like a template.
+Colour belongs to the frame and the food. Prices, names and controls stay plain, so
+nothing competes with them.
 
 ---
 
@@ -32,8 +30,13 @@ ornament and it will look like a template.
 
 ### Font loading — do this first and verify it
 
-**Use Noto Sans Georgian** (variable), loaded via `next/font/google` with both
-the `georgian` and `latin` subsets. It is on Google Fonts, has a real Georgian
+Three families, each with one job, all loaded via `next/font/google`:
+
+- **Noto Serif Georgian** — headings and big figures (`text-h1/h2/h3`, `text-stat`)
+- **Noto Sans Georgian** — everything you read or operate
+- **Fraunces** — the Bazzar wordmark only
+
+**Noto Sans Georgian** (variable) has both the `georgian` and `latin` subsets. It is on Google Fonts, has a real Georgian
 subset drawn for the script, and covers Latin and numerals in the same family.
 
 Do **not** use FiraGO from Fontsource or Google Fonts. FiraGO is not on Google
@@ -55,7 +58,7 @@ Fixed scale. Nothing outside it.
 
 | Token | Size / line-height | Weight | Use |
 |---|---|---|---|
-| `micro` | 11 / 16 | 500 | Meta labels, unit suffixes, table headers |
+| `micro` | 12 / 16 | 500 | Meta labels, unit suffixes, table headers |
 | `small` | 13 / 20 | 400 | Secondary text, supplier name, delivery info |
 | `body` | 15 / 23 | 400 | Default body text |
 | `strong` | 15 / 23 | 500 | Emphasised body, form labels |
@@ -82,68 +85,49 @@ is why body is 15 rather than 14 and line-heights run generous.
 
 ## 3. Colour
 
-Replace the previous palette entirely. The warm cream and wine red read dated
-next to a hard geometric wordmark; a neutral ramp with a black primary reads
-sharp and current, and lets prices dominate.
+Tokens live in `app/globals.css`. Colours that take an opacity modifier are defined
+as `-c` channel triplets there.
 
-```css
---paper:        #FFFFFF;   /* page background */
---surface:      #FAFAFA;   /* panels, table header, inset areas */
---surface-hover:#F4F4F5;   /* row hover */
-
---ink:          #0F0F10;   /* primary text, primary buttons */
---ink-2:        #52525B;   /* secondary text, supplier name */
---ink-3:        #A1A1AA;   /* tertiary — units, per-unit price, placeholders */
-
---line:         #E8E8EB;   /* default borders and dividers */
---line-strong:  #D4D4D8;   /* input borders, emphasised dividers */
-
---accent:       #XXXXXX;   /* Accelerate brand colour — set this */
---accent-soft:  /* accent at 8% opacity, for selected backgrounds */
-
---ok:           #15803D;
---warn:         #B45309;
---danger:       #B91C1C;
-```
+| Token | Value | Use |
+|---|---|---|
+| `--canvas` | `#F6EFE3` | Page background |
+| `--paper` | `#FFFDF9` | Cards, sheets, inputs |
+| `--surface` / `--surface-hover` | `#FBF5EA` / `#F5ECDC` | Inset areas, hover |
+| `--ink` / `-2` / `-3` | `#24190F` / `#54483E` / `#6E6053` | Text |
+| `--line` / `--line-strong` | `#EADFCE` / `#D8C9B2` | Dividers, input borders |
+| `--brand` / `--brand-deep` | `#7E1F2E` / `#561320` | Band, primary buttons, sidebar, cart bar |
+| `--accent` | `#A92639` | Active states, links, focus |
+| `--saffron` / `-soft` | `#E9A63A` / `#FCEFD6` | Best price, unread counts, warnings |
+| `--herb-soft`, `--ok` | `#E3EFE6`, `#1F6B47` | Confirmed, money, positive changes |
+| `--warn`, `--danger` | `#8F5400`, `#B3261E` | Warnings, errors |
 
 ### Usage rules
 
-- **Primary buttons are `--ink` (near-black) with white text.** Not the accent.
-  This is the single biggest visual change from before — black primaries read
-  decisive and modern; a coloured primary on every screen reads like a template.
-- `--accent` appears only on: the active navigation item, selected filter chips,
-  focus rings, and the order total figure. Four places. Nothing else.
-- No gradients. No tinted section backgrounds. No coloured cards.
-- Status colours appear as a 6px dot plus text in `--ink-2`. Never as a filled
-  pill badge on every row — that turns a scannable list into confetti.
+- **Pomegranate is the buyer's side; herb green is the distributor's.** Setting
+  `data-persona="supplier"` on the root swaps the brand and accent colours, so you
+  always know which side of the market you're on.
+- Saffron is the one highlight. If everything is highlighted, nothing is.
+- Every text colour holds 4.5:1 on `--canvas`. The buyer is 40+ and reading a phone
+  in a hurry, so `--ink-3` is never a pale grey.
+- Gradients appear only as an overlay on photographs, to keep text readable.
+- Status is a soft pill in the status colour (`StatusDot`).
 
 ---
 
 ## 4. Spacing, radius, borders, shadow
 
-**Spacing scale:** 4, 8, 12, 16, 24, 32, 48, 64. Nothing else. No arbitrary
-values.
+**Spacing scale:** 4, 8, 12, 16, 24, 32, 48, 64.
 
-**Radius:**
-- 6px — inputs, buttons, chips, steppers
-- 10px — sheets, modals, dropdown panels
-- 0px — table rows and dividers
+**Radius:** 6px small tags, 10px cards, buttons and inputs (`rounded`), 16px heroes,
+sheets and the cart bar (`rounded-lg`). `rounded-full` for filter chips, status
+pills and avatars.
 
-Do not round anything more than 10px. Large radii and pill shapes are the
-fastest way to make this look like a generic starter template.
+**Surfaces:** content sits on `.card`: paper, a 1px `--line` border and the soft
+`shadow-card`. Hover raises it to `shadow-lift`. Overlays use `--shadow-float`.
 
-**Borders:** 1px `--line` everywhere. Inputs use `--line-strong`. Never 2px
-except on focus.
-
-**Shadow:** exactly one, used only on floating surfaces (modal, bottom sheet,
-dropdown panel, sticky cart bar):
-
-```css
-box-shadow: 0 1px 3px rgb(0 0 0 / 0.06), 0 8px 24px rgb(0 0 0 / 0.08);
-```
-
-Zero shadow on rows, buttons, inputs, or cards. Separation comes from borders
-and background, not elevation.
+**Icons:** Phosphor only, through `components/screens/Glyphs.tsx`: duotone for
+things, bold for controls, fill for the active tab. Each idea always gets the same
+icon. Don't draw inline SVGs.
 
 ---
 
@@ -153,10 +137,10 @@ The default failure is too much padding, which makes six results fill a screen
 and destroys the comparison the product exists for.
 
 **Search result row:**
-- Vertical padding 14px, horizontal 16px
-- Total row height 76–84px on mobile, 68–72px on desktop
-- 1px `--line` divider between rows, no gap, no card, no border-radius
-- Nine to ten rows visible on a 380×800 viewport without scrolling past the fold
+- A card with 12px padding and a 64px photo
+- Name, price and add button share the top line; supplier and delivery run the
+  full width below, since a buyer needs to read those whole
+- 8px between cards on a phone, 12px in the grid
 
 **Row internal layout:**
 
@@ -174,20 +158,20 @@ meta line 2 (11/500, --ink-3)                  [stepper]
 **Forms:** input height 44px, 8px between label and field, 20px between fields,
 32px between field groups.
 
-**Page:** max content width 1100px, page padding 16px mobile / 32px desktop,
-section spacing 32px.
+**Page:** content fills the screen, with page padding 16px mobile / 32px desktop
+and section spacing 32px. From 768px, product lists become card grids of two to
+four columns. Forms and single documents stay at 720px.
 
 ---
 
 ## 6. Components
 
 **Button**
-- Primary: `--ink` background, white text, 6px radius, height 40 (default) / 44
-  (large) / 32 (small), horizontal padding 16, weight 500
-- Secondary: white background, 1px `--line-strong`, `--ink` text
+- Primary: `--brand` background, white text, height 40 / 44 (large) / 32 (small)
+- Secondary: paper background, 1px `--line-strong`, `--ink` text
 - Ghost: transparent, `--ink-2` text, `--surface-hover` on hover
-- Destructive: white background, `--danger` text and border
-- No shadows, no gradients, no transform on hover. Hover changes background only.
+- Destructive: paper background, `--danger` text and border
+- A press scales to 97%
 
 **Input**
 - 44px height, 1px `--line-strong`, 6px radius, 12px horizontal padding
@@ -196,38 +180,61 @@ section spacing 32px.
 - Label above at `strong`, helper text below at `small` in `--ink-3`
 
 **Stepper**
-- Single bordered unit, 36px tall, minus / value / plus in one enclosure
-- Value is tabular, centred, minimum 32px wide so it does not jump between
-  1 and 10
+- Single bordered unit, 40px tall, minus / value / plus in one enclosure
+- Value is a typeable numeric field, tabular and centred, so 20kg never means
+  twenty taps
 - Unit label (`თარო`, `კგ`) sits outside the control in `micro` `--ink-3`
 - Disabled minus at minimum quantity, not hidden
 
 **Filter chip**
-- 32px tall, 6px radius, 1px `--line-strong`, 12px horizontal padding
-- Inactive: white background, `--ink-2` text
+- 40px tall, fully rounded, 1px `--line-strong`
 - Active: `--accent-soft` background, `--accent` border and text
-- Chevron only when it opens a menu
 
-**Status**
-- 6px dot in the status colour, 6px gap, label at `small` in `--ink-2`
-- Never a filled badge
+**Navigation**
+- Phone: a brand-coloured app bar on top and a tab bar at the thumb. The cart bar
+  sits above the tab bar; the cart page swaps both for its send button.
+- Desktop: the deep sidebar, with categories as small round photos
 
 ---
 
-## 7. Motion and accessibility
+## 7. Friction rules
 
-- Transitions: 120ms ease-out on background and border colour only
-- No transform, scale or translate on hover
-- Motion only as feedback for a user action — item added to cart, order
-  confirmed. No entrance animations, no scroll reveals, no skeleton shimmer
-  (use a static `--surface` block)
+The path from opening the app to a placed order is the product. Hold these on
+every change to it:
+
+- **Login:** the last digit of the phone number and of the code are the submit.
+  The session is remembered, so most days the first screen is home.
+- **Search:** the box stays on the results screen, and results follow it as you
+  type. No going back to search for the next item.
+- **Adding:** one tap on the row, no product page or sheet in between.
+- **Units:** everything is listed, priced and counted by the single piece, kg or
+  litre, never the batch. Each product has a minimum: the first tap on + adds
+  it, minus below it removes the line, and typed quantities round up to it. The
+  trash sits right next to the stepper's plus.
+- **Ordering:** cart and checkout are one screen. Delivery fields default to the
+  last used values and only open on request.
+- **Repeat orders:** `გამეორება` on home, then one tap to send.
+- **Minimums:** a short supplier never blocks the others. Warn on the search row
+  while it's still easy to fix; ready orders go, the short one stays in the cart.
+- **Supplier adds:** find the item in the shared catalogue, set a price, move on
+  to the next. A whole price list pastes in from Excel. Never show another
+  supplier's prices here.
+- Tap targets are 36px minimum for the row's add button, 40px everywhere else.
+
+---
+
+## 8. Motion and accessibility
+
+- Screens ease in over 220ms (`.enter`); hover and press transitions are 120ms
+- Cards lift on hover, photo tiles zoom slightly, buttons give on press
+- No scroll reveals and no skeleton shimmer (use a static `--surface` block)
 - Focus rings visible on every interactive element, keyboard-reachable in a
   sensible order
 - Respect `prefers-reduced-motion`
 
 ---
 
-## 8. The kitchen sink page itself
+## 9. The kitchen sink page itself
 
 It is a component inventory, not a designed screen, and it will never look like
 a product. But it should still be organised: components grouped with `h3`

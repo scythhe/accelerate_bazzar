@@ -2,9 +2,12 @@
 // licensed) for each canonical item, centre-crop to a square, and save into
 // public/products/{slug}.jpg — replacing the icon-tile placeholders.
 // Run:  node scripts/fetch-product-photos.mjs
+// Search hits vary, and some photos were then hand-picked to match the product
+// (beer, vodka, chacha, tkemali, buckwheat, soy-sauce, ghomi, ketchup, rice and
+// others), so pass slugs and check the results instead of re-running everything.
 
 import sharp from "sharp";
-import { writeFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 
 const OUT = new URL("../public/products/", import.meta.url);
 
@@ -44,6 +47,31 @@ const QUERY = {
   "pickle-cucumber": "pickled cucumbers jar",
   jonjoli: "pickled bladdernut jonjoli",
   "pickled-cabbage": "pickled cabbage jar",
+  "wine-red": "glass of red wine",
+  "wine-white": "glass of white wine",
+  beer: "beer bottles",
+  vodka: "shot glass vodka",
+  chacha: "grappa glass",
+  cognac: "brandy snifter glass",
+  napkins: "paper napkins stack",
+  "toilet-paper": "toilet paper rolls",
+  "paper-towels": "paper towel roll kitchen",
+  "wet-wipes": "wet wipes package",
+  "liquid-soap": "liquid soap dispenser",
+  "dish-soap": "washing up liquid",
+  gloves: "disposable nitrile gloves",
+  buckwheat: "buckwheat groats",
+  lentils: "red lentils",
+  beans: "red kidney beans",
+  ghomi: "millet grains",
+  oats: "rolled oats",
+  semolina: "semolina",
+  tkemali: "tkemali sauce",
+  ketchup: "ketchup",
+  mayonnaise: "homemade mayonnaise",
+  mustard: "dijon mustard spoon",
+  adjika: "adjika sauce",
+  "soy-sauce": "soy sauce bottle",
 };
 
 const BAD = /(map|flag|logo|icon|stamp|coin|drawing|diagram|clip ?art|cartoon|chart|graph|banknote|coat of arms|postcard)/i;
@@ -109,7 +137,7 @@ for (const [slug, query] of entries) {
     await sharp(buf)
       .resize(480, 480, { fit: "cover", position: "attention" })
       .jpeg({ quality: 80, chromaSubsampling: "4:2:0" })
-      .toFile(out.pathname);
+      .toFile(fileURLToPath(out));
     console.log(`✓ ${slug} <- ${title}`);
     ok++;
   } catch (err) {

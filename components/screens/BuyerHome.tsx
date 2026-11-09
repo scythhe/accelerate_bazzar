@@ -1,35 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Input } from "@/components/ui";
-import { Screen } from "./Screen";
+import { Band, Screen } from "./Screen";
+import { PinIcon } from "./Glyphs";
+import { SearchBox } from "./SearchBox";
 import { OrderListRow } from "./OrderListRow";
-import { CategoryIcon, SearchIcon } from "./CategoryIcon";
 import { useDemo } from "@/lib/store/DemoContext";
 import { BUYER, HOME_CATEGORIES } from "@/lib/mock/data";
 
-// Matches the hues baked into the generated product placeholder images
-// (scripts/gen-product-images.mjs) so the tile badge and the thumbnails a tap
-// away feel like one system.
-const CATEGORY_HUE: Record<string, number> = {
-  eggs: 44,
-  veg: 132,
-  fruit: 20,
-  dairy: 208,
-  meat: 4,
-  bakery: 32,
-  oil: 66,
-  pickle: 92,
-};
-
-// Buyer home — the search field is the page. Below it a category strip and the
-// two most recent orders (DEMO_PROMPT.md §1).
+// Buyer home — the search field is the page. Below it the two shortest ways to
+// an order: repeat a recent one, or tap a category.
 export function BuyerHome() {
   const router = useRouter();
-  const { orders } = useDemo();
+  const { orders, deliveryAddress } = useDemo();
   const [q, setQ] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // A keyboard user gets straight to typing. Phones skip this: the on-screen
+  // keyboard would cover the reorder list before they've chosen to search.
+  useEffect(() => {
+    if (window.matchMedia("(min-width: 1024px)").matches) {
+      inputRef.current?.focus();
+    }
+  }, []);
 
   const recent = orders
     .filter((o) => o.buyerId === BUYER.id)
@@ -44,77 +39,59 @@ export function BuyerHome() {
 
   return (
     <Screen>
-      <section
-        className="-mx-4 -mt-4 px-4 pb-7 pt-6 sm:-mx-6 sm:px-6"
-        style={{
-          background:
-            "linear-gradient(155deg, hsl(14 62% 42%), hsl(14 68% 32%))",
-        }}
-      >
-        <p className="text-h1 tracking-tight text-white">Accelerate</p>
-        <p className="mt-1 text-small text-white/75">{BUYER.displayName}</p>
+      <Band image="/brand/hero-market.jpg">
+        <h1 className="text-h1">{BUYER.displayName}</h1>
+        <p className="mt-1 flex items-center gap-1.5 text-body text-white/90">
+          <PinIcon className="h-5 w-5" />
+          <span className="truncate">{deliveryAddress}</span>
+        </p>
+        <div className="mt-5 max-w-2xl">
+          <SearchBox ref={inputRef} value={q} onChange={setQ} onSubmit={go} suggest large />
+        </div>
+      </Band>
 
-        <form
-          className="mt-5"
-          onSubmit={(e) => {
-            e.preventDefault();
-            go(q);
-          }}
-        >
-          <Input
-            aria-label="ძებნა"
-            leading={<SearchIcon />}
-            placeholder="ძებნა — მაგ. კვერცხი, ხახვი, ზეთი"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            enterKeyHint="search"
-          />
-          <button type="submit" className="sr-only">
-            ძებნა
-          </button>
-        </form>
-      </section>
-
-      <div className="mt-6 grid grid-cols-4 gap-2 lg:grid-cols-6 xl:grid-cols-8 xl:gap-3">
-        {HOME_CATEGORIES.map((c) => {
-          const hue = CATEGORY_HUE[c.slug] ?? 0;
-          return (
-            <button
-              key={c.label}
-              type="button"
-              onClick={() => go(c.query)}
-              className="flex flex-col items-center gap-1.5 rounded-md border border-line bg-paper py-3 transition-colors hover:border-line-strong hover:bg-surface-hover"
-            >
-              <span
-                className="flex h-10 w-10 items-center justify-center rounded-full"
-                style={{
-                  backgroundColor: `hsl(${hue} 55% 94%)`,
-                  color: `hsl(${hue} 40% 38%)`,
-                }}
-              >
-                <CategoryIcon slug={c.slug} />
-              </span>
-              <span className="text-micro leading-[13px] text-ink-2">
-                {c.label}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      <section className="mt-8">
+      <section className="mt-6">
         <div className="flex items-baseline justify-between">
-          <h2 className="text-h3 text-ink">ბოლო შეკვეთები</h2>
+          <h2 className="text-h3 text-ink">შეუკვეთეთ ისევ</h2>
           <Link
             href="/orders"
-            className="text-small text-ink-2 transition-colors hover:text-ink"
+            className="py-1 text-small font-medium text-accent transition-colors hover:text-brand"
           >
             ყველა
           </Link>
         </div>
-        <div className="mt-2 rounded border border-line px-1 shadow-card xl:grid xl:grid-cols-2 xl:gap-x-6 xl:px-3">
+        <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
           {recent.map((o) => (
             <OrderListRow key={o.id} order={o} href={`/orders/${o.id}`} />
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-8">
+        <h2 className="text-h3 text-ink">კატეგორიები</h2>
+        <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6 md:gap-3">
+          {HOME_CATEGORIES.map((c) => (
+            <button
+              key={c.slug}
+              type="button"
+              onClick={() => go(c.query)}
+              className="group relative aspect-[4/3] overflow-hidden rounded bg-surface-hover text-left shadow-card transition-shadow hover:shadow-lift"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={c.image}
+                alt=""
+                loading="lazy"
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+              <span
+                aria-hidden="true"
+                className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent"
+              />
+              <span className="absolute inset-x-2 bottom-1.5 text-small font-semibold leading-tight text-white md:text-strong">
+                {c.label}
+              </span>
+            </button>
           ))}
         </div>
       </section>

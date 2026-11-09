@@ -8,6 +8,10 @@ export interface InputProps
   error?: string;
   /** Short leading adornment, e.g. "+995" or "₾". */
   leading?: React.ReactNode;
+  /** Trailing control, e.g. a clear button. */
+  trailing?: React.ReactNode;
+  /** The hero search box. */
+  large?: boolean;
   /** Tabular figures — set for any numeric field. */
   numeric?: boolean;
 }
@@ -16,7 +20,7 @@ export interface InputProps
 // Focus: 1px --ink border + 3px --accent ring at 20% (DESIGN_SYSTEM.md §6).
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   (
-    { label, hint, error, leading, numeric, className, id, disabled, ...props },
+    { label, hint, error, leading, trailing, large, numeric, className, id, disabled, ...props },
     ref,
   ) => {
     const autoId = useId();
@@ -36,7 +40,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
         <div
           className={cn(
-            "flex h-11 items-center gap-2 rounded border bg-paper px-3 transition-colors",
+            "flex items-center gap-2 rounded border bg-paper transition-colors",
+            large ? "h-14 px-4 shadow-lift" : "h-11 px-3",
             error
               ? "border-danger focus-within:shadow-[0_0_0_3px_var(--accent-ring)]"
               : "border-line-strong focus-within:border-ink focus-within:shadow-[0_0_0_3px_var(--accent-ring)]",
@@ -61,6 +66,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             )}
             {...props}
           />
+          {trailing}
         </div>
         {error ? (
           <p id={`${inputId}-error`} className="text-small text-danger">

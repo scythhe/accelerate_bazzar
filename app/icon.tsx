@@ -3,8 +3,7 @@ import { ImageResponse } from "next/og";
 export const size = { width: 64, height: 64 };
 export const contentType = "image/png";
 
-// The wordmark is the only loud mark in the product — the favicon echoes that:
-// a plain --ink square with the initial, nothing else.
+// The awning mark on the pomegranate band colour.
 export default function Icon() {
   return new ImageResponse(
     (
@@ -15,15 +14,17 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#0F0F10",
+          background: "#7E1F2E",
           borderRadius: 12,
-          color: "#FFFFFF",
-          fontSize: 40,
-          fontWeight: 700,
-          fontFamily: "sans-serif",
         }}
       >
-        A
+        <svg viewBox="0 0 32 32" width="50" height="50">
+          <path d="M7 18v10M25 18v10M7 24.5h18" fill="none" stroke="#FFF6E5" strokeWidth="2.2" strokeLinecap="round" />
+          <path d="M4 5h6v12a3 3 0 0 1-6 0z" fill="#E9A63A" />
+          <path d="M10 5h6v12a3 3 0 0 1-6 0z" fill="#FFF6E5" />
+          <path d="M16 5h6v12a3 3 0 0 1-6 0z" fill="#E9A63A" />
+          <path d="M22 5h6v12a3 3 0 0 1-6 0z" fill="#FFF6E5" />
+        </svg>
       </div>
     ),
     { ...size },

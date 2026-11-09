@@ -10,6 +10,7 @@ export interface SwitchProps {
 }
 
 // Availability toggle. --ok when on (available), --line-strong track when off.
+// The knob travels left to right to turn on, 2px inside the track at both ends.
 // The one place in the app a fully-round shape is right: it's a universal
 // switch affordance, not decoration.
 export function Switch({ checked, onChange, label, disabled }: SwitchProps) {
@@ -30,8 +31,8 @@ export function Switch({ checked, onChange, label, disabled }: SwitchProps) {
       <span
         aria-hidden
         className={cn(
-          "absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform",
-          checked ? "translate-x-[18px]" : "translate-x-0.5",
+          "absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-card transition-transform",
+          checked ? "translate-x-4" : "translate-x-0",
         )}
       />
     </button>

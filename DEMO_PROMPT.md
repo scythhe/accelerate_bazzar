@@ -23,7 +23,8 @@ Build only these. Nothing else.
    This is the screen the whole demo hinges on.
 3. **Cart** — grouped by supplier, each group showing its subtotal against that
    supplier's minimum order, with a visible warning when a group is short.
-4. **Checkout** — delivery address, requested delivery date, note. One screen.
+4. **Checkout** — merged into the cart: delivery address, date and note default
+   to the last used values and open on request.
 5. **Order placed** — confirmation showing that three separate orders were
    created, one per supplier.
 6. **Orders** — list, and a detail view with items and a simple status timeline.
@@ -39,7 +40,8 @@ Build only these. Nothing else.
 
 ## The demo path — this must work perfectly, in this order
 
-1. Open on the buyer home
+1. Log in (phone, then code `123456`) and land on the buyer home. Later visits
+   skip this; the persona sheet's reset or logout brings it back.
 2. Search `კვერცხი`
 3. See eight suppliers with different prices, aligned for comparison
 4. Add items from three different suppliers
@@ -57,13 +59,13 @@ Any dead end mid-path kills the demo.
 
 ## Explicitly not in this build
 
-Login, OTP, registration, admin screens, the mapping queue, supplier catalogue
+Registration, admin screens, the mapping queue, supplier catalogue
 management, product forms, CSV import, delivery settings, company profiles,
 settings pages, team members, desktop layouts, empty search states beyond one
 basic case.
 
-The app opens directly into the buyer home with a persona already active. There
-is no authentication of any kind.
+Login is mocked: any Georgian mobile number and the code `123456`. The session,
+cart and orders persist in the browser until the demo is reset.
 
 ## Data
 

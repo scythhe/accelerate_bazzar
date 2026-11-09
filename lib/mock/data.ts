@@ -1,6 +1,7 @@
 import type {
   BaseUnit,
   CanonicalItem,
+  CatalogueNews,
   Order,
   Organization,
   Supplier,
@@ -13,14 +14,21 @@ import type {
 
 /** The buyer persona. */
 export const BUYER: Organization & { type: "BUYER" } = {
-  id: "buy-octopus",
+  id: "buy-alazani",
   type: "BUYER",
-  legalName: "შპს ოქტოპუსი",
-  displayName: "რესტორანი ოქტოპუსი",
+  legalName: "შპს ალაზანი",
+  displayName: "რესტორანი ალაზანი",
   taxId: "205123456",
 };
 
 export const BUYER_ADDRESS = "ვაკე, ირ. აბაშიძის ქ. 24";
+
+/** Saved delivery points. Each starts with its district, which is what search
+ *  filters suppliers by. */
+export const BUYER_ADDRESSES = [
+  BUYER_ADDRESS,
+  "ისანი, ქინძმარაულის ქ. 3 (საწყობი)",
+];
 
 /** The supplier persona — orders placed in the demo land in this inbox. */
 export const SUPPLIER_PERSONA_ID = "sup-agro";
@@ -167,6 +175,7 @@ interface Seed {
   unit: BaseUnit;
   pack: Pack;
   base: number; // reference price per pack, GEL
+  min?: number; // smallest order in base units; see minQtyFor
   spread: number; // how many suppliers carry it
   terms: string[]; // extra search terms
   variants?: string[]; // supplier naming variants
@@ -183,6 +192,7 @@ const SEEDS: Seed[] = [
     unit: "ცალი",
     pack: P("თარო (30 ცალი)", 30),
     base: 12,
+    min: 30,
     spread: 8,
     terms: ["კვერცხი", "კვერცხის", "kvercxi", "kvertskhi", "яйца", "egg", "eggs"],
     variants: [
@@ -511,14 +521,14 @@ const SEEDS: Seed[] = [
   },
   {
     slug: "rice",
-    cat: "bakery",
-    catLabel: "საცხობი",
+    cat: "grains",
+    catLabel: "ბურღულეული",
     nameKa: "ბრინჯი",
     unit: "კგ",
     pack: P("ტომარა 25 კგ", 25),
     base: 78,
     spread: 3,
-    terms: ["ბრინჯი", "brinji", "rice", "рис"],
+    terms: ["ბრინჯი", "brinji", "rice", "рис", "ბურღული"],
   },
   {
     slug: "pasta",
@@ -603,6 +613,285 @@ const SEEDS: Seed[] = [
     spread: 2,
     terms: ["კომბოსტო მწნილი", "მწნილი", "pickled cabbage"],
   },
+  // alcohol
+  {
+    slug: "wine-red",
+    cat: "alcohol",
+    catLabel: "ალკოჰოლი",
+    nameKa: "ღვინო საფერავი, 0.75 ლ",
+    unit: "ცალი",
+    pack: P("ყუთი 6 ბოთლი", 6),
+    base: 75,
+    spread: 5,
+    terms: ["ღვინო", "საფერავი", "ღვინო წითელი", "gvino", "wine", "вино"],
+  },
+  {
+    slug: "wine-white",
+    cat: "alcohol",
+    catLabel: "ალკოჰოლი",
+    nameKa: "ღვინო რქაწითელი, 0.75 ლ",
+    unit: "ცალი",
+    pack: P("ყუთი 6 ბოთლი", 6),
+    base: 66,
+    spread: 5,
+    terms: ["ღვინო", "რქაწითელი", "ღვინო თეთრი", "gvino", "wine", "вино"],
+  },
+  {
+    slug: "beer",
+    cat: "alcohol",
+    catLabel: "ალკოჰოლი",
+    nameKa: "ლუდი ღია, 0.5 ლ",
+    unit: "ცალი",
+    pack: P("ყუთი 20 ბოთლი", 20),
+    base: 56,
+    spread: 6,
+    terms: ["ლუდი", "ludi", "beer", "пиво"],
+  },
+  {
+    slug: "vodka",
+    cat: "alcohol",
+    catLabel: "ალკოჰოლი",
+    nameKa: "არაყი, 0.5 ლ",
+    unit: "ცალი",
+    pack: P("ყუთი 12 ბოთლი", 12),
+    base: 160,
+    spread: 4,
+    terms: ["არაყი", "araki", "vodka", "водка"],
+  },
+  {
+    slug: "chacha",
+    cat: "alcohol",
+    catLabel: "ალკოჰოლი",
+    nameKa: "ჭაჭა, 0.5 ლ",
+    unit: "ცალი",
+    pack: P("ყუთი 6 ბოთლი", 6),
+    base: 120,
+    spread: 3,
+    terms: ["ჭაჭა", "chacha", "чача"],
+  },
+  {
+    slug: "cognac",
+    cat: "alcohol",
+    catLabel: "ალკოჰოლი",
+    nameKa: "კონიაკი, 0.5 ლ",
+    unit: "ცალი",
+    pack: P("ყუთი 6 ბოთლი", 6),
+    base: 186,
+    spread: 3,
+    terms: ["კონიაკი", "konyak", "cognac", "brandy", "коньяк"],
+  },
+  // hygiene
+  {
+    slug: "napkins",
+    cat: "hygiene",
+    catLabel: "ჰიგიენა",
+    nameKa: "ქაღალდის ხელსახოცი, 100 ც.",
+    unit: "ცალი",
+    pack: P("ყუთი 30 შეკვრა", 30),
+    base: 66,
+    spread: 5,
+    terms: ["ხელსახოცი", "სალფეთქი", "napkin", "tissue", "салфетки"],
+  },
+  {
+    slug: "toilet-paper",
+    cat: "hygiene",
+    catLabel: "ჰიგიენა",
+    nameKa: "ტუალეტის ქაღალდი",
+    unit: "ცალი",
+    pack: P("შეკვრა 48 რულონი", 48),
+    base: 62,
+    spread: 5,
+    terms: ["ტუალეტის ქაღალდი", "ქაღალდი", "toilet paper", "туалетная бумага"],
+  },
+  {
+    slug: "paper-towels",
+    cat: "hygiene",
+    catLabel: "ჰიგიენა",
+    nameKa: "ქაღალდის პირსახოცი",
+    unit: "ცალი",
+    pack: P("შეკვრა 12 რულონი", 12),
+    base: 48,
+    spread: 4,
+    terms: ["პირსახოცი", "ქაღალდი", "paper towel", "tissue", "бумажные полотенца"],
+  },
+  {
+    slug: "wet-wipes",
+    cat: "hygiene",
+    catLabel: "ჰიგიენა",
+    nameKa: "სველი ხელსახოცი, 72 ც.",
+    unit: "ცალი",
+    pack: P("ყუთი 24 შეკვრა", 24),
+    base: 84,
+    spread: 3,
+    terms: ["სველი ხელსახოცი", "ხელსახოცი", "wet wipes", "tissue", "влажные салфетки"],
+  },
+  {
+    slug: "liquid-soap",
+    cat: "hygiene",
+    catLabel: "ჰიგიენა",
+    nameKa: "თხევადი საპონი",
+    unit: "ლ",
+    pack: P("ბიდონი 5 ლ", 5),
+    base: 22,
+    spread: 4,
+    terms: ["საპონი", "sapnis", "soap", "мыло"],
+  },
+  {
+    slug: "dish-soap",
+    cat: "hygiene",
+    catLabel: "ჰიგიენა",
+    nameKa: "ჭურჭლის სარეცხი საშუალება",
+    unit: "ლ",
+    pack: P("ბიდონი 5 ლ", 5),
+    base: 26,
+    spread: 4,
+    terms: ["ჭურჭლის სარეცხი", "სარეცხი", "dish soap", "detergent", "моющее средство"],
+  },
+  {
+    slug: "gloves",
+    cat: "hygiene",
+    catLabel: "ჰიგიენა",
+    nameKa: "ერთჯერადი ხელთათმანი, 100 ც.",
+    unit: "ცალი",
+    pack: P("ყუთი 10 კოლოფი", 10),
+    base: 150,
+    spread: 3,
+    terms: ["ხელთათმანი", "gloves", "перчатки"],
+  },
+  // grains
+  {
+    slug: "buckwheat",
+    cat: "grains",
+    catLabel: "ბურღულეული",
+    nameKa: "წიწიბურა",
+    unit: "კგ",
+    pack: P("ტომარა 25 კგ", 25),
+    base: 125,
+    spread: 5,
+    terms: ["წიწიბურა", "წიწიბურის", "buckwheat", "гречка"],
+  },
+  {
+    slug: "lentils",
+    cat: "grains",
+    catLabel: "ბურღულეული",
+    nameKa: "ოსპი",
+    unit: "კგ",
+    pack: P("ტომარა 25 კგ", 25),
+    base: 115,
+    spread: 4,
+    terms: ["ოსპი", "ospi", "lentils", "чечевица"],
+  },
+  {
+    slug: "beans",
+    cat: "grains",
+    catLabel: "ბურღულეული",
+    nameKa: "ლობიო, მშრალი",
+    unit: "კგ",
+    pack: P("ტომარა 25 კგ", 25),
+    base: 180,
+    spread: 5,
+    terms: ["ლობიო", "lobio", "beans", "фасоль"],
+  },
+  {
+    slug: "ghomi",
+    cat: "grains",
+    catLabel: "ბურღულეული",
+    nameKa: "ღომი",
+    unit: "კგ",
+    pack: P("ტომარა 10 კგ", 10),
+    base: 42,
+    spread: 3,
+    terms: ["ღომი", "ghomi", "gomi", "millet", "гоми"],
+  },
+  {
+    slug: "oats",
+    cat: "grains",
+    catLabel: "ბურღულეული",
+    nameKa: "შვრიის ფანტელი",
+    unit: "კგ",
+    pack: P("ტომარა 10 კგ", 10),
+    base: 38,
+    spread: 3,
+    terms: ["შვრია", "ფანტელი", "oats", "овсянка"],
+  },
+  {
+    slug: "semolina",
+    cat: "grains",
+    catLabel: "ბურღულეული",
+    nameKa: "მანანა",
+    unit: "კგ",
+    pack: P("ტომარა 25 კგ", 25),
+    base: 72,
+    spread: 3,
+    terms: ["მანანა", "semolina", "манка"],
+  },
+  // sauces
+  {
+    slug: "tkemali",
+    cat: "sauces",
+    catLabel: "სოუსები",
+    nameKa: "ტყემალი, 0.5 ლ",
+    unit: "ცალი",
+    pack: P("ყუთი 12 ბოთლი", 12),
+    base: 60,
+    spread: 5,
+    terms: ["ტყემალი", "tkemali", "соус ткемали", "სოუსი"],
+  },
+  {
+    slug: "adjika",
+    cat: "sauces",
+    catLabel: "სოუსები",
+    nameKa: "აჯიკა, 0.25 ლ",
+    unit: "ცალი",
+    pack: P("ყუთი 12 ქილა", 12),
+    base: 72,
+    spread: 4,
+    terms: ["აჯიკა", "ajika", "adjika", "аджика", "სოუსი"],
+  },
+  {
+    slug: "ketchup",
+    cat: "sauces",
+    catLabel: "სოუსები",
+    nameKa: "კეტჩუპი",
+    unit: "კგ",
+    pack: P("ვედრო 5 კგ", 5),
+    base: 30,
+    spread: 5,
+    terms: ["კეტჩუპი", "ketchup", "кетчуп", "სოუსი"],
+  },
+  {
+    slug: "mayonnaise",
+    cat: "sauces",
+    catLabel: "სოუსები",
+    nameKa: "მაიონეზი",
+    unit: "კგ",
+    pack: P("ვედრო 5 კგ", 5),
+    base: 36,
+    spread: 5,
+    terms: ["მაიონეზი", "mayonnaise", "майонез", "სოუსი"],
+  },
+  {
+    slug: "mustard",
+    cat: "sauces",
+    catLabel: "სოუსები",
+    nameKa: "მდოგვი, 0.5 კგ",
+    unit: "ცალი",
+    pack: P("ყუთი 12 ქილა", 12),
+    base: 54,
+    spread: 3,
+    terms: ["მდოგვი", "mustard", "горчица", "სოუსი"],
+  },
+  {
+    slug: "soy-sauce",
+    cat: "sauces",
+    catLabel: "სოუსები",
+    nameKa: "სოიოს სოუსი",
+    unit: "ლ",
+    pack: P("ბიდონი 5 ლ", 5),
+    base: 60,
+    spread: 3,
+    terms: ["სოიო", "სოიოს სოუსი", "soy sauce", "соевый соус", "სოუსი"],
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -645,10 +934,17 @@ export const CANONICAL_ITEMS: CanonicalItem[] = SEEDS.map((s) => ({
   nameKa: s.nameKa,
   baseUnit: s.unit,
   searchTerms: Array.from(new Set([s.nameKa, s.catLabel, s.cat, ...s.terms])),
+  imageUrl: `/products/${s.slug}.jpg`,
 }));
 
 export const canonicalById = (id: string) =>
   CANONICAL_ITEMS.find((c) => c.id === id);
+
+/** Enough to be worth a delivery without forcing a whole sack or case on a
+ *  kitchen that has run out mid-service. */
+function minQtyFor(s: Seed): number {
+  return s.min ?? Math.min(s.pack.qty, s.unit === "ცალი" ? 6 : 5);
+}
 
 const built: SupplierProduct[] = [];
 for (const s of SEEDS) {
@@ -665,9 +961,12 @@ for (const s of SEEDS) {
       canonicalItemId: `can-${s.slug}`,
       nameKa: name,
       baseUnit: s.unit,
-      packLabel: s.pack.label,
-      packQuantity: s.pack.qty,
-      pricePerPack: priceFor(s, supIdx),
+      // Listed and counted by the single piece, kg or litre, never the batch
+      // it ships in: the seed's wholesale pack only sets the price.
+      packLabel: `1 ${s.unit}`,
+      packQuantity: 1,
+      pricePerPack: Math.round((priceFor(s, supIdx) / s.pack.qty) * 100) / 100,
+      minQty: minQtyFor(s),
       isAvailable: hash(`${id}:avail`) % 11 !== 0,
       imageUrl,
     });
@@ -688,6 +987,54 @@ function pickProduct(slug: string, supplierId?: string): SupplierProduct {
 }
 
 // ---------------------------------------------------------------------------
+// News feed — every supplier's recent catalogue changes.
+// ---------------------------------------------------------------------------
+
+const NEWS_LABELS = [
+  "დღეს, 09:40",
+  "დღეს, 08:15",
+  "გუშინ, 17:30",
+  "გუშინ, 11:05",
+  "2 დღის წინ",
+];
+
+/** Fresh copy every call. createdAt stays below any real timestamp, so anything
+ *  a supplier does live lands on top and counts as unread. */
+export function seedNews(): CatalogueNews[] {
+  const round2 = (n: number) => Math.round(n * 100) / 100;
+  const out: CatalogueNews[] = [];
+  const perRound = SUPPLIERS.length;
+
+  for (let round = 0; round < 3; round++) {
+    SUPPLIERS.forEach((s, i) => {
+      const items = SUPPLIER_PRODUCTS.filter(
+        (p) => p.supplierId === s.id && p.isAvailable,
+      );
+      if (items.length === 0) return;
+      const p = items[(i * 5 + round * 7) % items.length];
+      const label = Math.min(
+        Math.floor((out.length / (perRound * 3)) * NEWS_LABELS.length),
+        NEWS_LABELS.length - 1,
+      );
+      out.push({
+        id: `n-seed-${s.id}-${round}`,
+        supplierId: s.id,
+        productId: p.id,
+        kind: round === 0 ? "NEW_PRODUCT" : "PRICE_CHANGE",
+        price: p.pricePerPack,
+        oldPrice:
+          round === 0
+            ? undefined
+            : round2(p.pricePerPack * (round === 1 ? 1.08 : 0.94)),
+        at: NEWS_LABELS[label],
+        createdAt: 500 - out.length,
+      });
+    });
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------
 // Seed orders
 // ---------------------------------------------------------------------------
 
@@ -697,6 +1044,8 @@ const line = (
   supplierId?: string,
 ): Order["items"][number] => {
   const p = pickProduct(slug, supplierId);
+  // Seed orders read as "4 sacks"; the line itself is counted in base units.
+  const count = packs * (SEEDS.find((s) => s.slug === slug)?.pack.qty ?? 1);
   return {
     productId: p.id,
     nameKa: p.nameKa,
@@ -704,8 +1053,8 @@ const line = (
     baseUnit: p.baseUnit,
     packQuantity: p.packQuantity,
     pricePerPack: p.pricePerPack,
-    packs,
-    lineTotal: Math.round(p.pricePerPack * packs * 100) / 100,
+    packs: count,
+    lineTotal: Math.round(p.pricePerPack * count * 100) / 100,
     imageUrl: p.imageUrl,
   };
 };
@@ -852,16 +1201,25 @@ export function seedOrders(): Order[] {
   return [...buyerRecent, ...supplierInbox];
 }
 
-/** Category strip on the buyer home — chip → the query it runs. */
-export const HOME_CATEGORIES: { label: string; slug: string; query: string }[] = [
-  { label: "კვერცხი", slug: "eggs", query: "კვერცხი" },
-  { label: "ბოსტნეული", slug: "veg", query: "ბოსტნეული" },
-  { label: "ხილი", slug: "fruit", query: "ხილი" },
-  { label: "რძის ნაწარმი", slug: "dairy", query: "რძის ნაწარმი" },
-  { label: "ხორცი", slug: "meat", query: "ხორცი" },
-  { label: "მწნილი", slug: "pickle", query: "მწნილი" },
-  { label: "ზეთი", slug: "oil", query: "ზეთი" },
-  { label: "საცხობი", slug: "bakery", query: "საცხობი" },
+/** Category tiles on the buyer home — tile → the query it runs. */
+export const HOME_CATEGORIES: {
+  label: string;
+  slug: string;
+  query: string;
+  image: string;
+}[] = [
+  { label: "ბოსტნეული", slug: "veg", query: "ბოსტნეული", image: "/products/onion.jpg" },
+  { label: "ხილი", slug: "fruit", query: "ხილი", image: "/brand/cat-fruit.jpg" },
+  { label: "კვერცხი", slug: "eggs", query: "კვერცხი", image: "/products/eggs.jpg" },
+  { label: "რძის ნაწარმი", slug: "dairy", query: "რძის ნაწარმი", image: "/products/sulguni.jpg" },
+  { label: "ხორცი", slug: "meat", query: "ხორცი", image: "/products/pork.jpg" },
+  { label: "საცხობი", slug: "bakery", query: "საცხობი", image: "/brand/cat-bakery.jpg" },
+  { label: "ბურღულეული", slug: "grains", query: "ბურღულეული", image: "/products/lentils.jpg" },
+  { label: "ზეთი", slug: "oil", query: "ზეთი", image: "/products/oil-sunflower.jpg" },
+  { label: "მწნილი", slug: "pickle", query: "მწნილი", image: "/products/pickle-cucumber.jpg" },
+  { label: "სოუსები", slug: "sauces", query: "სოუსები", image: "/products/adjika.jpg" },
+  { label: "ალკოჰოლი", slug: "alcohol", query: "ალკოჰოლი", image: "/products/wine-red.jpg" },
+  { label: "ჰიგიენა", slug: "hygiene", query: "ჰიგიენა", image: "/products/paper-towels.jpg" },
 ];
 
 // ---------------------------------------------------------------------------

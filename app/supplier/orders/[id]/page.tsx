@@ -39,7 +39,7 @@ export default function SupplierOrderDetailPage() {
   };
 
   return (
-    <Screen>
+    <Screen narrow>
       <BackLink href="/" children="შემოსული" />
       {order ? (
         <>

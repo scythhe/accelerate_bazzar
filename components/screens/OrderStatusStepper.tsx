@@ -24,7 +24,10 @@ function Rail({ nodes }: { nodes: Node[] }) {
     <div>
       <div className="flex items-center">
         {nodes.map((n, i) => (
-          <div key={i} className="flex flex-1 items-center last:flex-none">
+          <div
+            key={i}
+            className={cn("flex items-center", i === 0 ? "flex-none" : "flex-1")}
+          >
             {i > 0 && (
               <div
                 className={cn(

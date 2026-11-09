@@ -14,7 +14,7 @@ export default function OpengraphImage() {
           flexDirection: "column",
           alignItems: "flex-start",
           justifyContent: "center",
-          background: "#FFFFFF",
+          background: "#561320",
           padding: "80px",
           fontFamily: "sans-serif",
         }}
@@ -23,13 +23,13 @@ export default function OpengraphImage() {
           style={{
             fontSize: 96,
             fontWeight: 700,
-            color: "#0F0F10",
+            color: "#FFFFFF",
             letterSpacing: "-2px",
           }}
         >
-          Accelerate
+          Bazzar
         </div>
-        <div style={{ fontSize: 34, color: "#52525B", marginTop: 24 }}>
+        <div style={{ fontSize: 34, color: "#E9A63A", marginTop: 24 }}>
           B2B food supply marketplace — Tbilisi
         </div>
       </div>

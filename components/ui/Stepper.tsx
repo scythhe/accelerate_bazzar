@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { Minus, Plus } from "@phosphor-icons/react";
 import { cn } from "./cn";
 
 export interface StepperProps {
@@ -7,6 +9,9 @@ export interface StepperProps {
   onChange: (next: number) => void;
   min?: number;
   max?: number;
+  /** Smallest real quantity: minus drops from here straight to `min`, and
+   *  anything typed below it rounds up. */
+  minQty?: number;
   step?: number;
   disabled?: boolean;
   /** Unit shown OUTSIDE the control, e.g. "თარო", "კგ". */
@@ -15,28 +20,43 @@ export interface StepperProps {
   label?: string;
 }
 
-// Single bordered enclosure, 36px tall. Value is tabular, centred, min 32px so
-// it does not jump between 1 and 10. Minus is disabled (not hidden) at the
-// minimum. Unit label sits outside in `micro` --ink-3 (DESIGN_SYSTEM.md §6).
+// Single bordered enclosure, 40px tall — big enough for wet hands. The value is
+// a real field: nobody should tap + twenty times for 20kg of cucumbers. Minus is
+// disabled (not hidden) at the minimum. Unit label sits outside in `micro`
+// --ink-3 (DESIGN_SYSTEM.md §6).
 export function Stepper({
   value,
   onChange,
   min = 0,
-  max = Infinity,
+  max = 9999,
+  minQty = 0,
   step = 1,
   disabled = false,
   unit,
   label = "რაოდენობა",
 }: StepperProps) {
-  const dec = () => onChange(Math.max(min, value - step));
+  // Non-null only while typing, so an emptied field can sit empty mid-edit
+  // without dropping the line from the cart.
+  const [draft, setDraft] = useState<string | null>(null);
+
+  const type = (raw: string) => {
+    const digits = raw.replace(/\D/g, "").slice(0, 4);
+    setDraft(digits);
+    if (!digits) return;
+    const n = Number(digits);
+    onChange(n === 0 ? min : Math.min(max, Math.max(min, minQty, n)));
+  };
+
+  const dec = () => {
+    const next = value - step;
+    onChange(next < minQty ? min : Math.max(min, next));
+  };
   const inc = () => onChange(Math.min(max, value + step));
   const atMin = disabled || value <= min;
   const atMax = disabled || value >= max;
 
-  // 36px tall (DESIGN_SYSTEM.md §6); 30px wide keeps the whole control inside a
-  // narrow results-row action cell.
   const btn =
-    "flex h-9 w-[30px] shrink-0 items-center justify-center text-ink transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:text-ink-3 disabled:hover:bg-transparent focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent";
+    "flex h-10 w-10 shrink-0 items-center justify-center text-ink transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:text-ink-3 disabled:hover:bg-transparent focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent";
 
   return (
     <div className="inline-flex items-center gap-2">
@@ -55,14 +75,26 @@ export function Stepper({
           aria-label="შემცირება"
           className={cn(btn, "border-r border-line-strong")}
         >
-          <MinusIcon />
+          <Minus weight="bold" aria-hidden="true" className="h-4 w-4" />
         </button>
-        <div
-          aria-live="polite"
-          className="flex min-w-8 items-center justify-center px-2 text-strong tabular text-ink"
-        >
-          {value}
-        </div>
+        <input
+          type="text"
+          inputMode="numeric"
+          enterKeyHint="done"
+          aria-label={label}
+          disabled={disabled}
+          value={draft ?? value}
+          onChange={(e) => type(e.target.value)}
+          onFocus={(e) => {
+            setDraft(String(value));
+            e.target.select();
+          }}
+          onBlur={() => setDraft(null)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") e.currentTarget.blur();
+          }}
+          className="w-12 bg-transparent text-center text-strong tabular text-ink outline-none focus:bg-accent-soft"
+        />
         <button
           type="button"
           onClick={inc}
@@ -70,31 +102,10 @@ export function Stepper({
           aria-label="მომატება"
           className={cn(btn, "border-l border-line-strong")}
         >
-          <PlusIcon />
+          <Plus weight="bold" aria-hidden="true" className="h-4 w-4" />
         </button>
       </div>
       {unit && <span className="text-micro text-ink-3">{unit}</span>}
     </div>
-  );
-}
-
-function MinusIcon() {
-  return (
-    <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden="true">
-      <path d="M3 8h10" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function PlusIcon() {
-  return (
-    <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden="true">
-      <path
-        d="M8 3v10M3 8h10"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-      />
-    </svg>
   );
 }

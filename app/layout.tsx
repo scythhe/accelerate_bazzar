@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Noto_Sans_Georgian } from "next/font/google";
+import { Fraunces, Noto_Sans_Georgian, Noto_Serif_Georgian } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
@@ -14,14 +14,29 @@ const notoSansGeorgian = Noto_Sans_Georgian({
   variable: "--font-sans",
 });
 
+/** Headings. A serif with real Georgian drawing gives the app a voice of its
+ *  own, the way a printed menu or market sign would. */
+const notoSerifGeorgian = Noto_Serif_Georgian({
+  subsets: ["georgian", "latin"],
+  display: "swap",
+  variable: "--font-display",
+});
+
+/** The wordmark only — soft, warm, a little old-world. */
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-logo",
+});
+
 const siteUrl = process.env.URL || process.env.DEPLOY_PRIME_URL;
 
 export const metadata: Metadata = {
   ...(siteUrl ? { metadataBase: new URL(siteUrl) } : {}),
-  title: "Accelerate",
+  title: "Bazzar",
   description: "მომწოდებლები და რესტორნები — ერთ სივრცეში.",
   openGraph: {
-    title: "Accelerate",
+    title: "Bazzar",
     description: "მომწოდებლები და რესტორნები — ერთ სივრცეში.",
     type: "website",
   },
@@ -31,7 +46,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#ffffff",
+  themeColor: "#7e1f2e",
 };
 
 export default function RootLayout({
@@ -40,8 +55,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ka" className={notoSansGeorgian.variable}>
-      <body className="min-h-dvh bg-paper text-ink">
+    <html
+      lang="ka"
+      className={`${notoSansGeorgian.variable} ${notoSerifGeorgian.variable} ${fraunces.variable}`}
+    >
+      <body className="min-h-dvh bg-canvas text-ink">
         <Providers>{children}</Providers>
       </body>
     </html>

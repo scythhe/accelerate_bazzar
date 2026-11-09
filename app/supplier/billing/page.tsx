@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { CheckCircle } from "@phosphor-icons/react";
 import { gel } from "@/components/ui";
 import { Screen } from "@/components/screens/Screen";
-import { SupplierNav } from "@/components/screens/SupplierNav";
 import { ClockIcon, CoinIcon, IconBadge, ReceiptIcon } from "@/components/screens/Glyphs";
 import { useDemo } from "@/lib/store/DemoContext";
 import { SUPPLIER_PERSONA_ID, SUPPLIER_PLAN, supplierById } from "@/lib/mock/data";
@@ -42,18 +42,13 @@ export default function SupplierBillingPage() {
   );
 
   return (
-    <Screen>
-      <p className="text-h2 tracking-tight text-ink">Accelerate</p>
-      <p className="mt-1 text-small text-ink-2">{supplier.displayName}</p>
-
-      <SupplierNav />
-
-      <h1 className="mt-5 text-h3 text-ink">გეგმა და გადახდა</h1>
+    <Screen narrow>
+      <h1 className="text-h2 text-ink">გეგმა და გადახდა</h1>
 
       {/* Trial status */}
-      <section className="mt-5 rounded border border-line px-4 py-4">
+      <section className="mt-5 card px-4 py-4">
         <div className="flex items-center gap-2.5">
-          <IconBadge hue={32} size={28}>
+          <IconBadge tone="saffron" size={28}>
             <ClockIcon />
           </IconBadge>
           <p className="text-strong text-ink">საცდელი პერიოდი აქტიურია</p>
@@ -63,7 +58,7 @@ export default function SupplierBillingPage() {
         </p>
         <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-surface-hover">
           <div
-            className="h-full rounded-full bg-ok"
+            className="h-full rounded-full bg-saffron"
             style={{ width: `${trialProgress}%` }}
           />
         </div>
@@ -75,9 +70,9 @@ export default function SupplierBillingPage() {
       </section>
 
       {/* Plan */}
-      <section className="mt-4 rounded border border-line-strong px-4 py-4 shadow-card">
+      <section className="mt-4 card px-4 py-4">
         <div className="flex items-center gap-2.5">
-          <IconBadge hue={142} size={28}>
+          <IconBadge tone="herb" size={28}>
             <CoinIcon />
           </IconBadge>
           <p className="text-strong text-ink">{SUPPLIER_PLAN.name} გეგმა</p>
@@ -92,20 +87,7 @@ export default function SupplierBillingPage() {
         <ul className="mt-3 space-y-2">
           {INCLUDED.map((line) => (
             <li key={line} className="flex gap-2 text-small text-ink-2">
-              <svg
-                viewBox="0 0 16 16"
-                className="mt-0.5 h-4 w-4 shrink-0 text-ok"
-                fill="none"
-                aria-hidden
-              >
-                <path
-                  d="m3 8 3.5 3.5L13 5"
-                  stroke="currentColor"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              <CheckCircle weight="fill" aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-ok" />
               {line}
             </li>
           ))}
@@ -113,12 +95,12 @@ export default function SupplierBillingPage() {
       </section>
 
       {/* This month */}
-      <section className="mt-4 rounded border border-line px-4 py-4">
+      <section className="mt-4 card px-4 py-4">
         <div className="flex items-center gap-2.5">
-          <IconBadge hue={216} size={28}>
+          <IconBadge tone="pomegranate" size={28}>
             <ReceiptIcon />
           </IconBadge>
-          <p className="text-micro text-ink-3">ამ თვეს Accelerate-ზე</p>
+          <p className="text-micro text-ink-3">ამ თვეს Bazzar-ზე</p>
         </div>
         <div className="mt-2.5 flex items-baseline justify-between">
           <span className="text-small text-ink-2">შეკვეთა</span>

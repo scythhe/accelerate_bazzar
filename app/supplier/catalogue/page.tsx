@@ -1,22 +1,42 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Switch, Thumb, gel, gelPerUnit } from "@/components/ui";
-import { Screen } from "@/components/screens/Screen";
-import { SupplierNav } from "@/components/screens/SupplierNav";
+import {
+  Button,
+  Input,
+  Sheet,
+  Switch,
+  Thumb,
+  TrashButton,
+  cn,
+  gel,
+} from "@/components/ui";
+import { PRODUCT_GRID, Screen } from "@/components/screens/Screen";
 import { BagIcon, IconBadge } from "@/components/screens/Glyphs";
 import { useDemo } from "@/lib/store/DemoContext";
 import { SUPPLIER_PERSONA_ID, SUPPLIER_PRODUCTS, supplierById } from "@/lib/mock/data";
+import type { SupplierProduct } from "@/lib/mock/types";
 
-// Catalogue management: availability toggle (live in buyer search) plus
-// adding a new product — the thing CLAUDE.md §4 says has to be trivial or a
+// Catalogue management: availability toggle (live in buyer search), adding and
+// deleting products — the thing CLAUDE.md §4 says has to be trivial or a
 // supplier just won't do it.
 export default function SupplierCataloguePage() {
   const router = useRouter();
-  const { persona, isAvailable, setAvailability, customProducts } = useDemo();
+  const {
+    persona,
+    isAvailable,
+    setAvailability,
+    customProducts,
+    removedProductIds,
+    removeProduct,
+    setProductPrice,
+  } = useDemo();
   const supplier = supplierById(SUPPLIER_PERSONA_ID);
+  const [deleting, setDeleting] = useState<SupplierProduct | null>(null);
+  const [repricing, setRepricing] = useState<SupplierProduct | null>(null);
+  const [newPrice, setNewPrice] = useState("");
 
   useEffect(() => {
     if (persona !== "supplier") router.replace("/");
@@ -27,30 +47,40 @@ export default function SupplierCataloguePage() {
     [customProducts],
   );
 
+  // Seed products, each swapped for its edited copy if it has one.
   const products = useMemo(
     () =>
-      SUPPLIER_PRODUCTS.filter((p) => p.supplierId === SUPPLIER_PERSONA_ID).sort(
-        (a, b) => a.nameKa.localeCompare(b.nameKa, "ka"),
-      ),
-    [],
+      SUPPLIER_PRODUCTS.filter(
+        (p) =>
+          p.supplierId === SUPPLIER_PERSONA_ID &&
+          !removedProductIds.includes(p.id),
+      )
+        .map((p) => ownCustom.find((c) => c.id === p.id) ?? p)
+        .sort((a, b) => a.nameKa.localeCompare(b.nameKa, "ka")),
+    [removedProductIds, ownCustom],
   );
 
   if (persona !== "supplier") return null;
 
-  const all = [...ownCustom, ...products];
+  const added = ownCustom.filter(
+    (c) => !SUPPLIER_PRODUCTS.some((p) => p.id === c.id),
+  );
+  const all = [...added, ...products];
   const availableCount = all.filter((p) => isAvailable(p)).length;
-  const newIds = new Set(ownCustom.map((p) => p.id));
+  const newIds = new Set(added.map((p) => p.id));
+
+  const parsedPrice = parseFloat(newPrice.replace(",", "."));
+  const savePrice = () => {
+    if (!repricing || !(parsedPrice > 0)) return;
+    setProductPrice(repricing.id, Math.round(parsedPrice * 100) / 100);
+    setRepricing(null);
+  };
 
   return (
     <Screen>
-      <p className="text-h2 tracking-tight text-ink">Accelerate</p>
-      <p className="mt-1 text-small text-ink-2">{supplier.displayName}</p>
-
-      <SupplierNav />
-
-      <div className="mt-5 flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <IconBadge hue={142} size={32}>
+          <IconBadge tone="herb" size={32}>
             <BagIcon />
           </IconBadge>
           <div>
@@ -62,7 +92,7 @@ export default function SupplierCataloguePage() {
         </div>
         <Link
           href="/supplier/catalogue/new"
-          className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded bg-ink px-3 text-strong text-white"
+          className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded bg-brand px-3 text-strong text-white"
         >
           <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" aria-hidden>
             <path
@@ -72,7 +102,7 @@ export default function SupplierCataloguePage() {
               strokeLinecap="round"
             />
           </svg>
-          პროდუქტი
+          დამატება
         </Link>
       </div>
       <p className="mt-1 text-small text-ink-2">
@@ -80,56 +110,124 @@ export default function SupplierCataloguePage() {
         შედეგებიდან.
       </p>
 
-      <div className="mt-3 border-y border-line xl:grid xl:grid-cols-2 xl:gap-x-8 xl:border-none">
+      <div className={cn(PRODUCT_GRID, "mt-3")}>
         {all.map((product) => {
           const available = isAvailable(product);
-          const pricePerBaseUnit =
-            Math.round((product.pricePerPack / product.packQuantity) * 100) /
-            100;
-          const isNew = newIds.has(product.id);
           return (
             <div
               key={product.id}
-              className="flex items-center gap-3 border-b border-line px-1 py-2.5 last:border-b-0"
+              className="card flex items-center gap-3 p-3 transition-shadow hover:shadow-lift"
             >
-              <Thumb src={product.imageUrl} name={product.nameKa} />
+              <span className={available ? "" : "opacity-55"}>
+                <Thumb src={product.imageUrl} name={product.nameKa} />
+              </span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
                   <p
                     className={
-                      "truncate text-title leading-[20px] " +
+                      "truncate text-strong " +
                       (available ? "text-ink" : "text-ink-3")
                     }
                   >
                     {product.nameKa}
                   </p>
-                  {isNew && (
+                  {newIds.has(product.id) && (
                     <span className="shrink-0 rounded-sm bg-accent px-1.5 py-px text-micro text-white">
                       ახალი
                     </span>
                   )}
                 </div>
-                <p className="truncate text-small text-ink-2">
-                  {product.packLabel}
-                </p>
-              </div>
-              <div className="shrink-0 text-right">
-                <p className="tabular text-strong text-ink">
-                  {gel(product.pricePerPack)}
-                </p>
-                <p className="tabular text-small text-ink-3">
-                  {gelPerUnit(pricePerBaseUnit, product.baseUnit)}
-                </p>
+                <button
+                  type="button"
+                  aria-label={`ფასის შეცვლა — ${product.nameKa}`}
+                  onClick={() => {
+                    setRepricing(product);
+                    setNewPrice(String(product.pricePerPack));
+                  }}
+                  className="tabular flex min-h-8 max-w-full items-center gap-1 truncate text-left text-small text-ink-2 underline-offset-2 hover:underline"
+                >
+                  <span className="font-medium text-accent">
+                    {gel(product.pricePerPack)}
+                  </span>
+                  <span className="truncate">
+                    / {product.baseUnit}
+                    {product.minQty > 1 ? ` · მინ. ${product.minQty}` : ""}
+                    {product.sku ? ` · ${product.sku}` : ""}
+                  </span>
+                </button>
               </div>
               <Switch
                 checked={available}
                 onChange={(next) => setAvailability(product.id, next)}
                 label={`${product.nameKa} — ხელმისაწვდომობა`}
               />
+              <TrashButton
+                label={`წაშლა — ${product.nameKa}`}
+                onClick={() => setDeleting(product)}
+              />
             </div>
           );
         })}
       </div>
+
+      <Sheet
+        open={repricing !== null}
+        onClose={() => setRepricing(null)}
+        title="ფასის შეცვლა"
+        description={repricing?.nameKa}
+        footer={
+          <Button block size="lg" disabled={!(parsedPrice > 0)} onClick={savePrice}>
+            შენახვა
+          </Button>
+        }
+      >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            savePrice();
+          }}
+        >
+          <Input
+            label={repricing ? `ახალი ფასი 1 ${repricing.baseUnit}` : ""}
+            leading="₾"
+            numeric
+            inputMode="decimal"
+            value={newPrice}
+            onChange={(e) => setNewPrice(e.target.value)}
+            autoFocus
+            onFocus={(e) => e.target.select()}
+            hint="მყიდველები ამას სიახლეებში ნახავენ."
+          />
+        </form>
+      </Sheet>
+
+      <Sheet
+        open={deleting !== null}
+        onClose={() => setDeleting(null)}
+        title="პროდუქტის წაშლა"
+        description={deleting?.nameKa}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setDeleting(null)}>
+              გაუქმება
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (deleting) removeProduct(deleting.id);
+                setDeleting(null);
+              }}
+            >
+              წაშლა
+            </Button>
+          </>
+        }
+      >
+        <p className="text-small text-ink-2">
+          პროდუქტი გაქრება კატალოგიდან და მყიდველების ძებნიდან. თუ მხოლოდ დროებით
+          არ გაქვთ, უბრალოდ გამორთეთ.
+        </p>
+      </Sheet>
     </Screen>
   );
 }

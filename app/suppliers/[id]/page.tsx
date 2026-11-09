@@ -2,16 +2,9 @@
 
 import { useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {
-  Avatar,
-  Button,
-  Stepper,
-  TableRow,
-  Thumb,
-  gel,
-  gelPerUnit,
-} from "@/components/ui";
-import { Screen, BackLink } from "@/components/screens/Screen";
+import { Avatar, TableRow, Thumb, cn, gel } from "@/components/ui";
+import { Screen, BackLink, PRODUCT_GRID } from "@/components/screens/Screen";
+import { AddButton, LineQty, unitLabel } from "@/components/screens/ProductQty";
 import { ClockIcon, CoinIcon, IconBadge, TruckIcon } from "@/components/screens/Glyphs";
 import { useDemo } from "@/lib/store/DemoContext";
 import { SUPPLIER_PRODUCTS, supplierById } from "@/lib/mock/data";
@@ -22,14 +15,8 @@ import { SUPPLIER_PRODUCTS, supplierById } from "@/lib/mock/data";
 export default function SupplierStorefrontPage() {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
-  const {
-    persona,
-    getPacks,
-    addOnePack,
-    setPacks,
-    isAvailable,
-    customProducts,
-  } = useDemo();
+  const { persona, getPacks, isAvailable, customProducts, removedProductIds } =
+    useDemo();
 
   useEffect(() => {
     if (persona !== "buyer") router.replace("/");
@@ -38,10 +25,17 @@ export default function SupplierStorefrontPage() {
   const supplier = supplierById(id);
   const products = useMemo(
     () =>
-      [...SUPPLIER_PRODUCTS, ...customProducts]
-        .filter((p) => p.supplierId === id)
+      [
+        ...SUPPLIER_PRODUCTS.filter(
+          (p) => !customProducts.some((c) => c.id === p.id),
+        ),
+        ...customProducts,
+      ]
+        .filter(
+          (p) => p.supplierId === id && !removedProductIds.includes(p.id),
+        )
         .sort((a, b) => a.nameKa.localeCompare(b.nameKa, "ka")),
-    [id, customProducts],
+    [id, customProducts, removedProductIds],
   );
 
   if (persona !== "buyer") return null;
@@ -50,7 +44,7 @@ export default function SupplierStorefrontPage() {
     <Screen>
       <BackLink href="/" children="მთავარი" />
 
-      <div className="rounded border border-line px-4 py-4">
+      <div className="card px-4 py-4">
         <div className="flex items-center gap-3">
           <Avatar name={supplier.displayName} seed={supplier.id} size={44} />
           <div className="min-w-0">
@@ -75,7 +69,7 @@ export default function SupplierStorefrontPage() {
         <div className="mt-3 grid grid-cols-3 gap-3 border-t border-line pt-3">
           <div>
             <div className="flex items-center gap-1.5 text-micro text-ink-3">
-              <IconBadge hue={142} size={20}>
+              <IconBadge tone="herb" size={20}>
                 <CoinIcon className="h-3 w-3" />
               </IconBadge>
               <span>მინ. შეკვეთა</span>
@@ -86,7 +80,7 @@ export default function SupplierStorefrontPage() {
           </div>
           <div>
             <div className="flex items-center gap-1.5 text-micro text-ink-3">
-              <IconBadge hue={32} size={20}>
+              <IconBadge tone="saffron" size={20}>
                 <ClockIcon className="h-3 w-3" />
               </IconBadge>
               <span>მიღება</span>
@@ -97,7 +91,7 @@ export default function SupplierStorefrontPage() {
           </div>
           <div>
             <div className="flex items-center gap-1.5 text-micro text-ink-3">
-              <IconBadge hue={216} size={20}>
+              <IconBadge tone="pomegranate" size={20}>
                 <TruckIcon className="h-3 w-3" />
               </IconBadge>
               <span>მიწოდება</span>
@@ -116,42 +110,30 @@ export default function SupplierStorefrontPage() {
         </span>
       </div>
 
-      <div className="mt-2 border-y border-line xl:grid xl:grid-cols-2 xl:gap-x-8 xl:border-none">
+      <div className={cn(PRODUCT_GRID, "mt-2")}>
         {products.map((product) => {
           const packs = getPacks(product.id);
           const available = isAvailable(product);
-          const pricePerBaseUnit =
-            Math.round((product.pricePerPack / product.packQuantity) * 100) /
-            100;
           return (
             <TableRow
               key={product.id}
               thumb={<Thumb src={product.imageUrl} name={product.nameKa} />}
               title={product.nameKa}
-              meta1={product.packLabel}
               meta2={
                 available ? "ხელმისაწვდომია" : "ამჟამად არ არის მარაგში"
               }
               price={gel(product.pricePerPack)}
-              perUnit={gelPerUnit(pricePerBaseUnit, product.baseUnit)}
+              perUnit={unitLabel(product)}
               unavailable={!available}
               action={
-                !available ? undefined : packs === 0 ? (
-                  <Button
-                    variant="secondary"
-                    aria-label={`დამატება — ${product.nameKa}`}
-                    onClick={() => addOnePack(product.id)}
-                    className="h-9 w-9 px-0 text-[18px] leading-none"
-                  >
-                    +
-                  </Button>
-                ) : (
-                  <Stepper
-                    value={packs}
-                    onChange={(v) => setPacks(product.id, v)}
-                    min={0}
-                  />
-                )
+                available && packs === 0 ? (
+                  <AddButton product={product} />
+                ) : undefined
+              }
+              footer={
+                available && packs > 0 ? (
+                  <LineQty product={product} />
+                ) : undefined
               }
             />
           );

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import { CheckCircle } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { StatusDot, gel } from "@/components/ui";
 import { Screen } from "@/components/screens/Screen";
@@ -9,7 +10,7 @@ import { useDemo } from "@/lib/store/DemoContext";
 
 export default function OrderPlacedPage() {
   const router = useRouter();
-  const { persona, orders, lastPlacedIds } = useDemo();
+  const { persona, orders, lastPlacedIds, cartCount } = useDemo();
 
   useEffect(() => {
     if (persona !== "buyer") {
@@ -27,19 +28,9 @@ export default function OrderPlacedPage() {
   if (placed.length === 0) return null;
 
   return (
-    <Screen>
+    <Screen narrow>
       <div className="mt-6 flex flex-col items-center text-center">
-        <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-ok text-white">
-          <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" aria-hidden>
-            <path
-              d="m5 12 4.5 4.5L19 7"
-              stroke="currentColor"
-              strokeWidth="2.25"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </span>
+        <CheckCircle weight="fill" aria-hidden="true" className="h-16 w-16 text-ok" />
         <h1 className="mt-3 text-h2 text-ink">
           შეიქმნა {placed.length} შეკვეთა
         </h1>
@@ -53,7 +44,7 @@ export default function OrderPlacedPage() {
           <Link
             key={o.id}
             href={`/orders/${o.id}`}
-            className="block rounded border border-line px-3 py-3 transition-colors hover:bg-surface-hover"
+            className="block card px-3 py-3 transition-colors hover:bg-surface-hover"
           >
             <div className="flex items-baseline justify-between">
               <p className="text-strong text-ink">{o.supplierName}</p>
@@ -73,17 +64,26 @@ export default function OrderPlacedPage() {
       </div>
 
       <div className="mt-6 space-y-2">
+        {cartCount > 0 && (
+          <Link
+            href="/cart"
+            className="flex min-h-11 items-center justify-between gap-2 rounded bg-saffron-soft px-3 py-2 text-small text-warn"
+          >
+            <span>კალათაში დარჩა {cartCount} ერთეული</span>
+            <span className="shrink-0 font-medium">გაგრძელება →</span>
+          </Link>
+        )}
         <Link
           href="/orders"
-          className="flex h-10 w-full items-center justify-center rounded bg-ink text-strong text-white"
+          className="flex h-11 w-full items-center justify-center rounded bg-brand text-strong text-white"
         >
           შეკვეთების ნახვა
         </Link>
         <Link
           href="/"
-          className="flex h-10 w-full items-center justify-center rounded border border-line-strong text-strong text-ink"
+          className="flex h-11 w-full items-center justify-center rounded border border-line-strong bg-paper text-strong text-ink"
         >
-          მთავარზე დაბრუნება
+          ახალი შეკვეთა
         </Link>
       </div>
     </Screen>

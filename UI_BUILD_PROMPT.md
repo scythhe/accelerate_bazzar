@@ -91,7 +91,7 @@ not, the demo is dead. Test this before moving on.
 A small floating control, visible only in development, that switches the active
 persona without any login flow:
 
-- Buyer — "რესტორანი ოქტოპუსი" (Vake)
+- Buyer — "რესტორანი ალაზანი" (Vake)
 - Buyer — a second restaurant in a different district, so the district filter is
   demonstrable
 - Supplier — "აგრო ჯგუფი"

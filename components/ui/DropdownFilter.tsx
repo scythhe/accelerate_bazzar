@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { CaretDown, Check } from "@phosphor-icons/react";
 import { cn } from "./cn";
 
 export interface FilterOption {
@@ -79,15 +80,17 @@ export function DropdownFilter({
         aria-expanded={open}
         aria-controls={panelId}
         className={cn(
-          "inline-flex h-8 items-center gap-1.5 rounded border px-3 text-small transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent",
+          "inline-flex h-10 items-center gap-1.5 rounded-full border px-4 text-small transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent",
           active
             ? "border-accent bg-accent-soft text-accent"
             : "border-line-strong bg-paper text-ink-2 hover:bg-surface-hover",
         )}
       >
         <span>{triggerText}</span>
-        <ChevronIcon
-          className={cn("transition-transform", open && "rotate-180")}
+        <CaretDown
+          weight="bold"
+          aria-hidden="true"
+          className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")}
         />
       </button>
 
@@ -117,7 +120,7 @@ export function DropdownFilter({
                       : "border-line-strong",
                   )}
                 >
-                  {checked && <CheckIcon className="h-3 w-3" />}
+                  {checked && <Check weight="bold" aria-hidden="true" className="h-3 w-3" />}
                 </span>
                 <span>{o.label}</span>
               </button>
@@ -135,43 +138,5 @@ export function DropdownFilter({
         </div>
       )}
     </div>
-  );
-}
-
-function ChevronIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 16 16"
-      className={cn("h-3.5 w-3.5", className)}
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="m4 6 4 4 4-4"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function CheckIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 16 16"
-      className={cn("h-3.5 w-3.5", className)}
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="m3 8 3.5 3.5L13 5"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }

@@ -12,13 +12,13 @@ export interface ButtonProps
   block?: boolean;
 }
 
-// Radius 6, weight 500, horizontal padding 16. No shadow, no gradient, no
-// transform on hover — hover changes background only (DESIGN_SYSTEM.md §6).
+// Primary is the band colour, so it follows the buyer/distributor side. A press
+// gets a small physical response (DESIGN_SYSTEM.md §6).
 const base =
-  "inline-flex select-none items-center justify-center gap-2 rounded px-4 font-medium leading-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-40";
+  "inline-flex select-none items-center justify-center gap-2 rounded px-4 font-medium leading-none transition-all active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-40";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-ink text-white hover:bg-[#26262b]",
+  primary: "bg-brand text-white shadow-card hover:bg-brand-deep",
   secondary:
     "border border-line-strong bg-paper text-ink hover:bg-surface-hover",
   ghost: "bg-transparent text-ink-2 hover:bg-surface-hover",

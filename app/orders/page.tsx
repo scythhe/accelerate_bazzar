@@ -24,9 +24,9 @@ export default function OrdersPage() {
       <BackLink href="/" children="მთავარი" />
       <h1 className="text-h2 text-ink">შეკვეთები</h1>
 
-      <div className="mt-3 xl:grid xl:grid-cols-2 xl:gap-x-8">
+      <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2 min-[1700px]:grid-cols-3 min-[2200px]:grid-cols-4">
         {mine.length === 0 ? (
-          <p className="py-10 text-center text-small text-ink-2">
+          <p className="col-span-full py-10 text-center text-small text-ink-2">
             შეკვეთები ჯერ არ არის.
           </p>
         ) : (

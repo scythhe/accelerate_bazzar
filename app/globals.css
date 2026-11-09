@@ -8,30 +8,52 @@
    hard-code colour, radius or shadow.
    --------------------------------------------------------------------------- */
 :root {
-  --paper: #ffffff; /* page background */
-  --surface: #fafafa; /* panels, table header, inset areas */
-  --surface-hover: #f4f4f5; /* row hover */
+  --canvas: #f6efe3; /* page background — warm cream */
+  --paper-c: 255 253 249;
+  --paper: rgb(var(--paper-c)); /* cards, sheets, inputs */
+  --surface: #fbf5ea; /* inset areas */
+  --surface-hover: #f5ecdc; /* hover */
 
-  --ink: #0f0f10; /* primary text, primary buttons */
-  --ink-2: #52525b; /* secondary text, supplier name */
-  --ink-3: #a1a1aa; /* tertiary — units, per-unit price, placeholders */
+  --ink-c: 36 25 15;
+  --ink: rgb(var(--ink-c)); /* primary text — warm near-black */
+  --ink-2: #54483e; /* secondary text */
+  --ink-3: #6e6053; /* tertiary. Holds 4.5:1 on --canvas. */
 
-  --line: #e8e8eb; /* default borders and dividers */
-  --line-strong: #d4d4d8; /* input borders, emphasised dividers */
+  --line: #eadfce; /* dividers */
+  --line-strong: #d8c9b2; /* input borders */
 
-  /* --accent — Accelerate brand colour: warm terracotta, the HoReCa-industry
-     tone (fits alongside food photography better than a cold blue). Change
-     here only. */
-  --accent: #d9502f;
-  --accent-soft: rgb(217 80 47 / 0.08); /* selected chip / row background */
-  --accent-ring: rgb(217 80 47 / 0.2); /* 3px focus ring */
+  /* The pomegranate band: top of every screen, primary buttons, sidebar. The
+     distributor side swaps it for herb green, so you always know which side of
+     the market you're on. */
+  --brand-c: 126 31 46;
+  --brand: rgb(var(--brand-c));
+  --brand-deep-c: 86 19 32;
+  --brand-deep: rgb(var(--brand-deep-c));
 
-  --ok: #15803d;
-  --warn: #b45309;
-  --danger: #b91c1c;
+  --accent: #a92639; /* active states, links, focus */
+  --accent-soft: rgb(169 38 57 / 0.08);
+  --accent-ring: rgb(169 38 57 / 0.2);
 
-  /* The one shadow. Floating surfaces only. */
-  --shadow-float: 0 1px 3px rgb(0 0 0 / 0.06), 0 8px 24px rgb(0 0 0 / 0.08);
+  --saffron-c: 233 166 58;
+  --saffron: rgb(var(--saffron-c)); /* the one highlight: best price, unread counts */
+  --saffron-soft: #fcefd6;
+  --herb-soft: #e3efe6;
+
+  --ok: #1f6b47;
+  --warn: #8f5400;
+  --danger-c: 179 38 30;
+  --danger: rgb(var(--danger-c));
+
+  /* Overlays: sheets, dropdowns, the cart bar. */
+  --shadow-float: 0 2px 6px rgb(60 30 10 / 0.08), 0 12px 32px rgb(60 30 10 / 0.14);
+}
+
+:root[data-persona="supplier"] {
+  --brand-c: 31 85 64;
+  --brand-deep-c: 18 59 44;
+  --accent: #1f6b47;
+  --accent-soft: rgb(31 107 71 / 0.1);
+  --accent-ring: rgb(31 107 71 / 0.2);
 }
 
 @layer base {
@@ -40,7 +62,7 @@
   }
 
   body {
-    background-color: var(--paper);
+    background-color: var(--canvas);
     color: var(--ink);
     font-family: var(--font-sans), "Noto Sans Georgian", system-ui, sans-serif;
     font-size: 15px;
@@ -57,12 +79,34 @@
     text-transform: none !important;
   }
 
+  /* Headings speak in the serif; everything you operate stays in the sans. */
   h1,
   h2,
   h3,
-  h4 {
+  h4,
+  .text-h1,
+  .text-h2,
+  .text-h3,
+  .text-stat {
+    font-family: var(--font-display), var(--font-sans), serif;
     font-weight: 700;
     letter-spacing: 0;
+  }
+
+  /* Any body-level press gets a small physical response. */
+  button:not(:disabled):active,
+  a:active {
+    transition-duration: 60ms;
+  }
+
+  /* iOS zooms the page on focus for anything under 16px, then leaves it zoomed
+     — a mid-order jolt on the phones this is built for. */
+  @media (max-width: 639px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
   }
 
   ::placeholder {
@@ -79,11 +123,34 @@
   }
 }
 
+@layer components {
+  /* The surface everything sits on. */
+  .card {
+    @apply rounded border border-line bg-paper shadow-card;
+  }
+}
+
 @layer utilities {
+  /* Screens ease in rather than snap. */
+  .enter {
+    animation: enter 220ms ease-out;
+  }
+
   /* Prices, quantities and numeric inputs — decimals must align down a column. */
   .tabular {
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum" 1;
+  }
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
